@@ -18,5 +18,5 @@ print((4 + 3) / 5)
 
 print("")
 
-print("Rechnung (4 + 3) // 5")
+print("Rechnung (4 + 3) // 5")  # Ausgabe ohne Komma
 print((4 + 3) // 5)
