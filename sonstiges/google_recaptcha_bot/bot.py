@@ -9,7 +9,7 @@ from urllib import request
 import speech_recognition
 
 # Pfad zum Bot
-data_path = r"/sonstiges/google_recaptcha_bot"
+data_path = r"C:\Users\danie\Git\pentest_private\google_recaptcha_bot"
 
 # browser festlegen
 browser = webdriver.Chrome(r"C:\Users\danie\AppData\Local\Programs\Python\chromedriver_win32\chromedriver.exe")

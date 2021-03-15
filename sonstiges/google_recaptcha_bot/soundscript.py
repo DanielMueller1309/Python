@@ -2,7 +2,7 @@ from pydub import AudioSegment
 import speech_recognition
 
 #Pfad des Bots
-data_path = r"/sonstiges/google_recaptcha_bot"
+data_path = r"C:\Users\danie\Git\pentest_private\google_recaptcha_bot"
 
 #Umwandeln von mp3 zu wav
 sound = AudioSegment.from_mp3(data_path + "\\audio.mp3")
