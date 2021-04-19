@@ -12,7 +12,7 @@ import speech_recognition
 data_path = r"C:\Users\danie\Git\pentest_private\google_recaptcha_bot"
 
 # browser festlegen
-browser = webdriver.Chrome(r"C:\Users\danie\AppData\Local\Programs\Python\chromedriver_win32\chromedriver.exe")
+browser = webdriver.Chrome(r"C:\Users\danie\AppData\Local\Programs\Python\chromedriver_win32_v90\chromedriver.exe")
 
 # reCaptcha aufrufen und auslösen
 browser.get("https://www.google.com/recaptcha/api2/demo")
