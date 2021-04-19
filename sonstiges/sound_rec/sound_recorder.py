@@ -26,7 +26,7 @@ while i > 0:
     channels = 1
     # 44100 samples per second
     sample_rate = 44100
-    record_seconds = 5
+    record_seconds = 60
     # initialize PyAudio object
     p = pyaudio.PyAudio()
     # open stream object as input & output
@@ -43,7 +43,7 @@ while i > 0:
         # if you want to hear your voice while recording
         #stream.write(data)
         frames.append(data)
-    print("Finished recording.")
+    print("Finished")
     # stop and close stream
     stream.stop_stream()
     stream.close()
