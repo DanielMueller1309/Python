@@ -8,9 +8,9 @@ import urllib
 from urllib import request
 import speech_recognition
 
-# Pfad zum Bot
-data_path = r"C:\Users\danie\Git\pentest_private\google_recaptcha_bot"
-
+# Pfad zur Sounddatei
+data_path = r"recaptcha_sounds\audio.mp3"
+new_data_path = r"recaptcha_sounds\audio.wav"
 # browser festlegen
 browser = webdriver.Chrome(r"C:\Users\danie\AppData\Local\Programs\Python\chromedriver_win32_v90\chromedriver.exe")
 
@@ -33,15 +33,15 @@ browser.find_element_by_xpath("html/body/div/div/div[3]/div/button").click()
 
 # audio finden und speichern
 src = browser.find_element_by_id("audio-source").get_attribute("src")
-urllib.request.urlretrieve(src, data_path + "\\audio.mp3")
+urllib.request.urlretrieve(src, data_path)
 
 # Umwandeln von mp3 zu wav
-sound = AudioSegment.from_mp3(data_path + "\\audio.mp3")
-sound.export(data_path + "\\audio.wav", format="wav")
+sound = AudioSegment.from_mp3(data_path)
+sound.export(new_data_path, format="wav")
 
 # Trans-scripting
 recognizer = speech_recognition.Recognizer()
-google_audio = speech_recognition.AudioFile(data_path + "\\audio.wav")
+google_audio = speech_recognition.AudioFile(new_data_path)
 with google_audio as source:
     audio = recognizer.record(source)
 text = recognizer.recognize_google(audio, language='de-DE')
@@ -51,5 +51,5 @@ print("<Erkannter Text> {}".format(text))
 inputfield = browser.find_element_by_id("audio-response")
 inputfield.send_keys(text.lower())
 inputfield.send_keys(Keys.ENTER)
-os.remove(data_path + "\\audio.wav")
-os.remove(data_path + "\\audio.mp3")
+os.remove(new_data_path)
+os.remove(data_path)
