@@ -5,22 +5,36 @@ from pynput.keyboard import Key, Controller as KeyboardController
 from pynput.mouse import Button, Controller as MouseController
 keyboard = KeyboardController()
 mouse = MouseController()
-# tmp zu python holen
-tmp = os.environ.get('tmp')
+
+#variablen gleich dem anderem programm wo das hier implementiert werden soll
+
+#temppath zu python holen
+tmp = os.environ.get('TMP')
+
+# homepath zu python holen
+home = os.environ.get('homepath')
+
+# newpath festlegen
+newpath_home = home + r'\.UpdateTool'
+newpath_tmp = tmp + r'\UpdateTool'
+
+
+# falls newpath nicht existiert erstelle ihn
+if not os.path.exists(newpath_home):
+  os.makedirs(newpath_home)
+if not os.path.exists(newpath_tmp):
+  os.makedirs(newpath_tmp)
+
 
 #default sleep time
 dst = 1
 
-# newpath festlegen
-newpath = tmp + r'\UpdateTool'
+
 #testprozedur
 def proz(z):
-    file = open(newpath + r'\keyboardtest.txt', 'a+')
+    file = open(newpath_tmp + r'\keyboardtest.txt', 'a+')
     file.write(str(z) + "\n")
     file.close()
-
-# homepath zu python holen
-home = os.environ.get('homepath')
 
 os.system(r'cmd /c "C:\Users\danie\Git\Python\sonstiges\sound_rec\displaydown.exe monitor off"')
 os.system(r'cmd /c ""')
