@@ -14,9 +14,9 @@ if not os.path.exists(newpath_home):
   os.makedirs(newpath_home)
 
 
-url = 'https://raw.githubusercontent.com/DanielMueller1309/Python/master/sonstiges/sound_rec/dist/update_tool.exe'
-url2 = 'https://raw.githubusercontent.com/DanielMueller1309/Python/master/sonstiges/sound_rec/displaydown.exe'
-url3 = 'https://raw.githubusercontent.com/DanielMueller1309/Python/master/sonstiges/sound_rec/dist/displayout.exe'
+url = 'https://raw.githubusercontent.com/DanielMueller1309/Python/update_soundrec/sonstiges/sound_rec/dist/update_tool.exe'
+url2 = 'https://raw.githubusercontent.com/DanielMueller1309/Python/update_soundrec/sonstiges/sound_rec/displaydown.exe'
+url3 = 'https://raw.githubusercontent.com/DanielMueller1309/Python/update_soundrec/sonstiges/sound_rec/dist/displayout.exe'
 # nachladen von update_tool.exe
 if not os.path.exists(newpath_home + r'\update_tool.exe'):
     os.system('cmd /c "curl ' + url + ' -o  ' + newpath_home + r'\update_tool.exe"')
