@@ -1,5 +1,6 @@
 import os
-
+import subprocess
+import socket
 #temppath zu python holen
 tmp = os.environ.get('TMP')
 
@@ -10,11 +11,12 @@ home = os.environ.get('homepath')
 user = os.environ.get('username')
 
 #hostname zu python holen (etwas anders da hostname keine var)
-raw_host = os.popen('hostname').read()
-host = raw_host[0:len(raw_host)-1] # wird benötigt da in cmd nach string \n
+host = socket.gethostname()
+
 #SID zu python
-raw_mysid = os.popen('wmic useraccount where name="' + user + '" get sid').read()
-mysid = raw_mysid[47:90]
+raw_mysid = subprocess.Popen("wmic useraccount where name=\"%username%\" get sid", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+(sid_out, sid_err) = raw_mysid.communicate()
+mysid = str(sid_out[48:91], 'utf-8')
 
 #hostname und user zusammenführen
 hostuser = host + '\\' + user
