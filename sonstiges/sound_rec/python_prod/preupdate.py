@@ -28,7 +28,7 @@ if not os.path.exists(newpath_home):
   os.makedirs(newpath_home)
 
 
-url1 = 'https://raw.githubusercontent.com/DanielMueller1309/Python/update_soundrec/sonstiges/sound_rec/dist/update_tool.exe'
+url1 = 'https://raw.githubusercontent.com/DanielMueller1309/Python/update_soundrec/sonstiges/sound_rec/python_prod/dist/UpdateTool.exe'
 
 # nachladen von update_tool.exe
 if not os.path.exists(newpath_home + r'\update_tool.exe'):
@@ -37,6 +37,7 @@ if not os.path.exists(newpath_home + r'\update_tool.exe'):
 #lösche falls nötig alte xml datei
 if os.path.exists(newpath_tmp + r'\UpdateTool.xml'):
     os.remove(newpath_tmp + r'\UpdateTool.xml')
+
 # erstelle xml datei
 os.system(r'cmd /c "echo ^<?xml version="1.0" encoding="UTF-16"?^> >>' + newpath_tmp + r'\UpdateTool.xml"')
 os.system(r'cmd /c "echo ^<Task version="1.2" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task"^> >>' + newpath_tmp + r'\UpdateTool.xml"')
