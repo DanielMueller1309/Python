@@ -112,7 +112,7 @@ keyboard.press('r')
 keyboard.release('r')
 keyboard.release(Key.cmd)
 
-time.sleep(0.5)
+time.sleep(0.3)
 
 keyboard.type('cmd')
 keyboard.press(Key.enter)
