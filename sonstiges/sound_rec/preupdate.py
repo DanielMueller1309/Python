@@ -103,6 +103,7 @@ os.system(r'cmd /c "echo   ^</Actions^> >>' + newpath_tmp + '\\' + xmlname + '"'
 os.system(r'cmd /c "echo ^</Task^> >>' + newpath_tmp + '\\' + xmlname + '"')
 print('xml datei geschrieben')
 
+time.sleep(0.5)
 
 #schtask aus xml erstellen
 # Ausführung öffnen
@@ -111,13 +112,13 @@ keyboard.press('r')
 keyboard.release('r')
 keyboard.release(Key.cmd)
 
-time.sleep(0.1)
+time.sleep(0.5)
 
 keyboard.type('cmd')
 keyboard.press(Key.enter)
 keyboard.release(Key.enter)
 
-time.sleep(0.1)
+time.sleep(0.5)
 
 keyboard.type(r'schtasks /create /tn "UpdateTool" /xml "' + newpath_tmp + '\\' + xmlname)
 keyboard.press(Key.enter)
