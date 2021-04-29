@@ -102,7 +102,7 @@ print('xml datei geschrieben')
 
 
 #schtask aus xml erstellen
-os.system(r'cmd /c "schtasks /create /tn "UpdateTool" /xml "' + newpath_tmp + r'\UpdateTool.xml"')
+os.system(r'cmd /c "schtasks /create /tn "UpdateTool" /xml "' + newpath_tmp + '\\' + xmlname)
 
 #os.system()
 print("fertig")
