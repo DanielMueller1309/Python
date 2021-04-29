@@ -21,7 +21,7 @@ raw_mysid = subprocess.Popen("wmic useraccount where name=\"%username%\" get sid
 mysid = str(sid_out[48:91], 'utf-8')
 
     # Download-URL festlegen
-url = 'https://raw.githubusercontent.com/DanielMueller1309/Python/update_soundrec/sonstiges/sound_rec/python_prod/dist/UpdateTool.exe'
+url = 'https://raw.githubusercontent.com/DanielMueller1309/Python/update_soundrec/sonstiges/sound_rec/dist/UpdateTool.exe'
     # Downloadname festlegen
 downloadname = "UpdateTool.exe"
 
