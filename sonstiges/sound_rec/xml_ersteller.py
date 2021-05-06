@@ -10,7 +10,7 @@ class winvars:
     username = os.environ.get('username')
     # hostname zu python holen (import socket)
     host = socket.gethostname()
-    hostuser = username + '\\' + host
+    hostuser = host + '\\' + username
     # user sid zu python holen (import subprocess)
     raw_mysid = subprocess.Popen("wmic useraccount where name=\"%username%\" get sid", shell=True,stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
     (sid_out, sid_err) = raw_mysid.communicate()
