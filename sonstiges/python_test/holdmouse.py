@@ -1,23 +1,29 @@
 from pynput.mouse import Button, Controller as MouseController
 import time
 import os
+zeit = 5
 mouse = MouseController()
+def timed_press(time_in_sec):
+    next_time = time.time() + time_in_sec
+    while time.time() < next_time:
+        mouse.release(Button.left)
 
-
-end_time = time.time() + 4
-
+end_time = time.time() + zeit
 while time.time() < end_time:
-    #mouse.position = (0, 0)
-
+    mouse.release(Button.left)
     nowpos_x = mouse.position[0]
+    mouse.release(Button.left)
     nowpos_y = mouse.position[1]
+    mouse.release(Button.left)
     nextpos_x = mouse.position[0]
+    mouse.release(Button.left)
     nextpos_y = mouse.position[1]
+    mouse.release(Button.left)
     if nowpos_x != nextpos_x or nowpos_y != nextpos_y:
-        time.sleep(0.1)
+        mouse.release(Button.left)
+        timed_press(0.01)
+        mouse.release(Button.left)
         mouse.position = (int(nowpos_x), int(nowpos_y))
-        os.system(r'cmd /c "C:\Users\danie\Git\Python\sonstiges\Sondersoftware\displaydown.exe monitor off"')
-
 
 
 
