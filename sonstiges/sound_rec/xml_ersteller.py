@@ -24,7 +24,7 @@ uriname = r'\UpdateTool'
 
 
 # writer to combining echo commands to one return var
-def writer(file):
+def writer(file): # needed modules: from datetime import datetime, timedelta
     cmd_command = '"' # set first quotation mark
     file = file.splitlines() # split string to list (split every \n to get one line in one listplace)
     for i in range(0, len(file)): # add echo command from splittet file
@@ -34,6 +34,24 @@ def writer(file):
         else:
             cmd_command = cmd_command + '"' # and if the last, add last quotation mark
     return cmd_command
+
+
+def plustime_xmlsyntax():
+    #set time with plustime in the brackets
+    start_time = datetime.now() + timedelta(minutes=2, seconds=30)
+    times = [start_time.year, start_time.month, start_time.day, start_time.hour, start_time.minute, start_time.second]
+    #for loop for leading zero
+    for i in range(0, len(times)-1):
+        if i == 0:
+            if len(str(times[0])) < 4:
+                for j in range(len(str(times[0])), 5):
+                    times[0] = "0" + str(times[0])
+        if i > 0:
+            if len(str(times[i])) < 2:
+                times[i] = "0" + str(times[i])
+    # new generates time in format: yyyy-mm-ddThh:mm:ss
+    new_date = time.strftime(str(times[0]) + '-' + str(times[1]) + '-' + str(times[2]) + 'T' + str(times[3]) + ':' + str(times[4]) + ':' + str(times[5]))
+    return new_date
 #write your xml file here and give specialvars names to change them (like other "Author", "URI", "UserID" or "Command")
 xml = r'''<?xml version="1.0" encoding="UTF-16"?>
 <Task version="1.2" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
