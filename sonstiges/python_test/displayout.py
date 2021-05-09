@@ -5,7 +5,6 @@ mouse = Controller()
 i = 1
 end_time = time.time() + 10
 
-#os.system(r'cmd /c "C:\Users\danie\Git\Python\sonstiges\sound_rec\displaydown.exe monitor off"')
 while time.time() < end_time:
     mouse.position = (0, 0)
     os.system(r'cmd /c "C:\Users\danie\Git\Python\sonstiges\sound_rec\displaydown.exe monitor off"')

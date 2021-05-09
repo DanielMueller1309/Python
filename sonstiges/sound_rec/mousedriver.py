@@ -1,7 +1,7 @@
 from pynput.mouse import Button, Controller as MouseController
 import time
 import os
-zeit = 5
+zeit = 10
 mouse = MouseController()
 def timed_press(time_in_sec):
     next_time = time.time() + time_in_sec
@@ -21,7 +21,7 @@ while time.time() < end_time:
     mouse.release(Button.left)
     if nowpos_x != nextpos_x or nowpos_y != nextpos_y:
         mouse.release(Button.left)
-        timed_press(0.01)
+        timed_press(0.1)
         mouse.release(Button.left)
         mouse.position = (int(nowpos_x), int(nowpos_y))
 
