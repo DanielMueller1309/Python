@@ -49,12 +49,13 @@ while i > 0:
         print("listenname: " + username_chatverlauf.text)
         username_chatverlauf.click()
         # ermittelt username aus angeklickten chat
-        username_chat = browser.find_element_by_xpath("html/body/div/div/div/div[4]/div/header/div[2]")
+        chat = browser.find_element_by_xpath("html/body/div/div/div/div[4]/div/header/div[2]")
+        username_chat = browser.find_element_by_xpath("html/body/div/div/div/div[4]/div/header/div[2]/div")
         print("chatkopf: "+ username_chat.text)
         # ermittelt onlinestatus
         print("Online-Status: ")
         time.sleep(0.1)
-        anzahl = username_chat.find_elements_by_tag_name("div")
+        anzahl = chat.find_elements_by_tag_name("div")
         # wenn zweites div element vorhanden ist wird geprüft ob es das wort online ist oder etwas anderes, bei online logge aktuelle zeit
         if len(anzahl) == 3:
             now = time.strftime("%m-%d-%y_%H-%M-%S")
