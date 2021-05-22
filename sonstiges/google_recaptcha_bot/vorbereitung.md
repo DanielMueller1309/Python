@@ -47,7 +47,7 @@ pip install SpeechRecognition
    - mit diesem command wird eine neue chrome session aufgemacht welche remote debugging auf port 9222 erlaubt.
    - danach dort mit Goggle Konto anmelden und dort weiterarbeiten. 
    - unter [127.0.0.1:9222](http://127.0.0.1:9222) kann man in einem anderen browser nun auf die Debugging-Umgebung zugreifen
-Code:
+Code(Windows):
 ```python
 # PYTHON Example
 from selenium import webdriver
@@ -60,5 +60,12 @@ chrome_driver = "<python_chrome_driver_path>"
 driver = webdriver.Chrome(chrome_driver, options=chrome_options)
 print(driver.title)
 ```     
-
+Code(Linux):
+```python
+from selenium import webdriver
+options = webdriver.ChromeOptions()
+options.add_experimental_option("debuggerAddress", "127.0.0.1:9222")
+browser = webdriver.Chrome(options=options, executable_path="<python_chrome_driver_path>")
+browser.switch_to.window(browser.window_handles[0])
+```
 Quelle: https://cosmocode.io/how-to-connect-selenium-to-an-existing-browser-that-was-opened-manually/   
