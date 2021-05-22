@@ -3,17 +3,24 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import os
 import platform
-tmp = os.environ.get('TMP')
 system = platform.platform()
+
+if 'Linux' in system:
+    tmp = "/tmp"
+    slashes = '/'
+if 'Windows' in system:
+    tmp = os.environ.get('TMP')
+    slashes = '\\'
+
 # erstelle datei wenn nicht vorhanden
 def in_datei_schreiben():
     now = time.strftime("%m-%d-%y_%H-%M-%S")
-    file = open(newpath + '\\' + username_chat.text + '.txt', 'a+')
+    file = open(newpath + slashes + username_chat.text + '.txt', 'a+')
     file.write(username_chat.text + '    ' + 'zuletzt online:' + now + "\n")
     file.close()
 
 # erstelle ordner zum speichern
-newpath = tmp + r'\timestamps'
+newpath = tmp + slashes +'timestamps'
 if not os.path.exists(newpath):
     os.makedirs(newpath)
 
