@@ -2,8 +2,9 @@ import time
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import os
+import platform
 tmp = os.environ.get('TMP')
-
+system = platform.platform()
 # erstelle datei wenn nicht vorhanden
 def in_datei_schreiben():
     now = time.strftime("%m-%d-%y_%H-%M-%S")
@@ -17,10 +18,25 @@ if not os.path.exists(newpath):
     os.makedirs(newpath)
 
 # setze wendriver auf chrome debugger fenster
-chrome_options = Options()
-chrome_options.add_experimental_option("debuggerAddress", "127.0.0.1:9222")
-chrome_driver = r"C:\Users\danie\AppData\Local\Programs\Python\chromedriver_win32_v90\chromedriver.exe"
-browser = webdriver.Chrome(chrome_driver, options=chrome_options)
+
+#windows
+def webdriver_win():
+    chrome_options = Options()
+    chrome_options.add_experimental_option("debuggerAddress", "127.0.0.1:9222")
+    chrome_driver = r"C:\Users\danie\AppData\Local\Programs\Python\chromedriver_win32_v90\chromedriver.exe"
+    browser = webdriver.Chrome(chrome_driver, options=chrome_options)
+    return browser
+#linux
+def webdriver_linux():
+    options = webdriver.ChromeOptions()
+    options.add_experimental_option("debuggerAddress", "127.0.0.1:9222")
+    browser = webdriver.Chrome(options=options, executable_path="/home/user/PycharmProjects/selenium_driver/chromedriver")
+    return browser
+if 'Linux' in system:
+    browser = webdriver_linux()
+if 'Windows' in system:
+    browser = webdriver_win()
+
 # wechselt zu aktuell offenen tab (sollte hierbei Whatsapp sein)
 browser.switch_to.window(browser.window_handles[0])
 
