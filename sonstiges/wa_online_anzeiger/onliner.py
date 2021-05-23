@@ -44,9 +44,16 @@ if 'Linux' in system:
 if 'Windows' in system:
     browser = webdriver_win()
 
+def test_connection():
+    oflinetester = browser.find_element_by_xpath("html/body/div/div[1]/div[1]/div[3]/div")  # .find_elements_by_tag_name("span")
+    while "Telefon nicht verbunden" in oflinetester.text:
+        print("Telefon nicht verbunden...warte")
+        time.sleep(3)
+
 # wechselt zu aktuell offenen tab (sollte hierbei Whatsapp sein)
 browser.switch_to.window(browser.window_handles[0])
-chatlist = browser.find_element_by_xpath("html/body/div/div[1]/div[1]/div[3]/div/div[2]/div[1]/div/div")
+test_connection()
+chatlist = browser.find_element_by_xpath(    "html/body/div/div[1]/div[1]/div[3]/div/div[2]/div[1]/div/div")
 nutzeranzahl = int(chatlist.get_attribute("aria-rowcount"))
 i = 1
 # voreinstellung der browser-fenster-höhen
@@ -55,6 +62,7 @@ i = 1
 # (werte händisch ermittelt)
 chrome_hoehe = 121
 header_hoehe = 59
+ofline_banner = 107
 sucher_hoehe = 49
 archive_hoehe = 49
 gesamt_vor_hoehe = chrome_hoehe + header_hoehe + sucher_hoehe + archive_hoehe
@@ -66,6 +74,7 @@ print("--------------------------------")
 while i > 0:
     # prüfe alle nutzer absteigend durch (aufsteigend müsste auch gehen, wurde aber noch nicht getestet)
     for j in range(nutzeranzahl, 0, -1):
+        test_connection()
         # ermittelt username aus chatverlauf
         username_chatverlauf = browser.find_element_by_xpath("html/body/div/div[1]/div[1]/div[3]/div/div[2]/div[1]/div/div/div[" + str(j) + "]/div/div/div[2]/div[1]/div[1]/span/span")
         print(str(j))
