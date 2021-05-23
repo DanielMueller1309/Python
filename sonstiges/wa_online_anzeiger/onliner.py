@@ -37,7 +37,7 @@ def webdriver_win():
 def webdriver_linux():
     options = webdriver.ChromeOptions()
     options.add_experimental_option("debuggerAddress", "127.0.0.1:9222")
-    browser = webdriver.Chrome(options=options, executable_path="/home/user/PycharmProjects/selenium_driver/chromedriver")
+    browser = webdriver.Chrome(options=options, executable_path="/home/user/Schreibtisch/ChromeDriver_90.0.4430.24/chromedriver")
     return browser
 if 'Linux' in system:
     browser = webdriver_linux()
@@ -46,8 +46,8 @@ if 'Windows' in system:
 
 # wechselt zu aktuell offenen tab (sollte hierbei Whatsapp sein)
 browser.switch_to.window(browser.window_handles[0])
-
-nutzeranzahl = int(browser.find_element_by_xpath("html/body/div/div[1]/div[1]/div[3]/div/div[2]/div[3]/div/div").get_attribute("aria-rowcount"))
+chatlist = browser.find_element_by_xpath("html/body/div/div[1]/div[1]/div[3]/div/div[2]/div[1]/div/div")
+nutzeranzahl = int(chatlist.get_attribute("aria-rowcount"))
 i = 1
 # voreinstellung der browser-fenster-höhen
 # da bei scrollbarem chatverlauf unerwünschte effekte auftreten wie das nicht alle chats mitgenommen werden
@@ -67,7 +67,7 @@ while i > 0:
     # prüfe alle nutzer absteigend durch (aufsteigend müsste auch gehen, wurde aber noch nicht getestet)
     for j in range(nutzeranzahl, 0, -1):
         # ermittelt username aus chatverlauf
-        username_chatverlauf = browser.find_element_by_xpath("html/body/div/div[1]/div[1]/div[3]/div/div[2]/div[3]/div/div/div[" + str(j) + "]/div/div/div[2]/div[1]/div[1]/span/span")
+        username_chatverlauf = browser.find_element_by_xpath("html/body/div/div[1]/div[1]/div[3]/div/div[2]/div[1]/div/div/div[" + str(j) + "]/div/div/div[2]/div[1]/div[1]/span/span")
         print(str(j))
         print("listenname: " + username_chatverlauf.text)
         username_chatverlauf.click()
@@ -91,4 +91,4 @@ while i > 0:
         else:
             print("offline")
         print("--------------------------------")
-        time.sleep(1)
+#        time.sleep(1)
