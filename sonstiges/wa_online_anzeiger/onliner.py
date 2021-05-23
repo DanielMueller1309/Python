@@ -62,10 +62,10 @@ i = 1
 # (werte händisch ermittelt)
 chrome_hoehe = 121
 header_hoehe = 59
-ofline_banner = 107
+offline_banner = 107
 sucher_hoehe = 49
 archive_hoehe = 49
-gesamt_vor_hoehe = chrome_hoehe + header_hoehe + sucher_hoehe + archive_hoehe
+gesamt_vor_hoehe = chrome_hoehe + header_hoehe + offline_banner + sucher_hoehe + archive_hoehe
 chat_hoehe = 73
 browser.set_window_size(600, gesamt_vor_hoehe + chat_hoehe * nutzeranzahl)
 
