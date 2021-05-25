@@ -37,35 +37,4 @@ pip install pydub
 pip install webdriver-manager
 pip install SpeechRecognition
 ```
-#### Installation Remote Debugging:
-1. Add Chrome to PATH
-    - über windows suchen umgebungsvariable `Path` bearbeiten und pfad zu `chrome.exe` hinzufügen.
-      (ohne zusatz zur exe sonst geht es nicht, siehe obere beispiele in der `PATH` variable)
-      
-1. Launch browser with custom flags
-    > chrome.exe --remote-debugging-port=9222 --user-data-dir="C:\selenum\ChromeProfile"
-   - mit diesem command wird eine neue chrome session aufgemacht welche remote debugging auf port 9222 erlaubt.
-   - danach dort mit Goggle Konto anmelden und dort weiterarbeiten. 
-   - unter [127.0.0.1:9222](http://127.0.0.1:9222) kann man in einem anderen browser nun auf die Debugging-Umgebung zugreifen
-Code(Windows):
-```python
-# PYTHON Example
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-
-chrome_options = Options()
-chrome_options.add_experimental_option("debuggerAddress", "127.0.0.1:9222")
-#Change chrome driver path accordingly
-chrome_driver = "<python_chrome_driver_path>"
-driver = webdriver.Chrome(chrome_driver, options=chrome_options)
-print(driver.title)
-```     
-Code(Linux):
-```python
-from selenium import webdriver
-options = webdriver.ChromeOptions()
-options.add_experimental_option("debuggerAddress", "127.0.0.1:9222")
-browser = webdriver.Chrome(options=options, executable_path="<python_chrome_driver_path>")
-browser.switch_to.window(browser.window_handles[0])
-```
-Quelle: https://cosmocode.io/how-to-connect-selenium-to-an-existing-browser-that-was-opened-manually/   
+  
