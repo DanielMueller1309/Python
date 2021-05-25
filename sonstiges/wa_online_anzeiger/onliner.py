@@ -20,7 +20,7 @@ def in_datei_schreiben():
     file.close()
 
 # erstelle ordner zum speichern
-newpath = tmp + slashes +'timestamps'
+newpath = tmp + slashes +'whatsapp_timestamps'
 if not os.path.exists(newpath):
     os.makedirs(newpath)
 
