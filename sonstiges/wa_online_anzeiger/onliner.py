@@ -6,7 +6,7 @@ import platform
 system = platform.platform()
 
 if 'Linux' in system:
-    tmp = "/tmp"
+    tmp = "/home/user"
     slashes = '/'
 if 'Windows' in system:
     tmp = os.environ.get('TMP')
@@ -20,7 +20,7 @@ def in_datei_schreiben():
     file.close()
 
 # erstelle ordner zum speichern
-newpath = tmp + slashes +'timestamps'
+newpath = tmp + slashes +'whatsapp_timestamps'
 if not os.path.exists(newpath):
     os.makedirs(newpath)
 
