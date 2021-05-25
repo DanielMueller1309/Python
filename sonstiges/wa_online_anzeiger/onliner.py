@@ -49,11 +49,23 @@ def test_connection():
     while "Telefon nicht verbunden" in oflinetester.text:
         print("Telefon nicht verbunden...warte")
         time.sleep(3)
+#div wert falls wieder probleme auftreten
+div_wert = 3
+
+#xpath variablen
+left_sidebar_all_xpath = "html/body/div/div[1]/div[1]/div[3]/div"
+chatlist_xpath = left_sidebar_all_xpath + "/div[2]/div[" + str(div_wert) + "]/div/div"
+archiviert_xpath = left_sidebar_all_xpath + "/div[2]/div[1]"
+chat_xpath = "html/body/div/div/div/div[4]/div/header/div[2]"
+chat_username_xpath = chat_xpath + "/div"
+onlinestatus_xpath = chat_xpath + "/div[2]/span"
 
 # wechselt zu aktuell offenen tab (sollte hierbei Whatsapp sein)
 browser.switch_to.window(browser.window_handles[0])
 test_connection()
-chatlist = browser.find_element_by_xpath(    "html/body/div/div[1]/div[1]/div[3]/div/div[2]/div[1]/div/div")
+
+# ermittelt nutzeranzahl
+chatlist = browser.find_element_by_xpath(chatlist_xpath)
 nutzeranzahl = int(chatlist.get_attribute("aria-rowcount"))
 i = 1
 # voreinstellung der browser-fenster-höhen
@@ -76,14 +88,15 @@ while i > 0:
     for j in range(nutzeranzahl, 0, -1):
         test_connection()
         # ermittelt username aus chatverlauf
-        username_chatverlauf = browser.find_element_by_xpath("html/body/div/div[1]/div[1]/div[3]/div/div[2]/div[1]/div/div/div[" + str(j) + "]/div/div/div[2]/div[1]/div[1]/span/span")
+        username_chatverlauf = browser.find_element_by_xpath(chatlist_xpath + "/div[" + str(j) + "]/div/div/div[2]/div[1]/div[1]/span/span")
         print(str(j))
         print("listenname: " + username_chatverlauf.text)
         username_chatverlauf.click()
         # ermittelt username aus angeklickten chat
-        chat = browser.find_element_by_xpath("html/body/div/div/div/div[4]/div/header/div[2]")
-        username_chat = browser.find_element_by_xpath("html/body/div/div/div/div[4]/div/header/div[2]/div")
-        print("chatkopf: "+ username_chat.text)
+        chat = browser.find_element_by_xpath(chat_xpath)
+        username_chat = browser.find_element_by_xpath(chat_username_xpath)
+        # zeigt chatheader noch einmal an um überprüfen zu können ob script sauber läuft
+        print("chatkopf: " + username_chat.text)
         # ermittelt onlinestatus
         print("Online-Status: ")
         time.sleep(0.1)
@@ -91,7 +104,7 @@ while i > 0:
         # wenn zweites div element vorhanden ist wird geprüft ob es das wort online ist oder etwas anderes, bei online logge aktuelle zeit
         if len(anzahl) == 3:
             now = time.strftime("%m-%d-%y_%H-%M-%S")
-            status = browser.find_element_by_xpath("html/body/div/div/div/div[4]/div/header/div[2]/div[2]/span").text
+            status = browser.find_element_by_xpath(onlinestatus_xpath).text
             if status == "online":
                 print('zuletzt online:' + now)
                 in_datei_schreiben()
