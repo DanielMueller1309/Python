@@ -43,7 +43,7 @@ if 'Linux' in system:
     browser = webdriver_linux()
 if 'Windows' in system:
     browser = webdriver_win()
-
+# testet ob gelbe Warnung das handy nicht verbunden ist existiert und bleibt in der schleife bis connection wieder da ist
 def test_connection():
     oflinetester = browser.find_element_by_xpath("html/body/div/div[1]/div[1]/div[3]/div")  # .find_elements_by_tag_name("span")
     while "Telefon nicht verbunden" in oflinetester.text:
@@ -68,8 +68,9 @@ test_connection()
 chatlist = browser.find_element_by_xpath(chatlist_xpath)
 nutzeranzahl = int(chatlist.get_attribute("aria-rowcount"))
 i = 1
+
 # voreinstellung der browser-fenster-höhen
-# da bei scrollbarem chatverlauf unerwünschte effekte auftreten wie das nicht alle chats mitgenommen werden
+# da bei scrollbarem chatverlauf unerwünschte effekte auftreten (nicht alle chats werden mitgenommen)
 # browserseitiges Zoomen ist nicht zu empfehlen da dadurch .click() nicht jeden nutzer mitnimmt und das script mit den usern durcheinander kommt
 browser.set_window_size(0, 0) # verkleinerung auf 0 um wirkliche Windowgröße zu ermitteln mit nachfolgendem browser.get_window_size().get("height")
 chrome_hoehe = browser.get_window_size().get("height")
@@ -101,7 +102,7 @@ while i > 0:
         print("Online-Status: ")
         time.sleep(0.1)
         anzahl = chat.find_elements_by_tag_name("div")
-        # wenn zweites div element vorhanden ist wird geprüft ob es das wort online ist oder etwas anderes, bei online logge aktuelle zeit
+        # wenn zweites div element vorhanden ist wird geprüft ob es das wort "online" ist oder etwas anderes, bei online logge aktuelle zeit
         if len(anzahl) == 3:
             now = time.strftime("%m-%d-%y_%H-%M-%S")
             status = browser.find_element_by_xpath(onlinestatus_xpath).text
