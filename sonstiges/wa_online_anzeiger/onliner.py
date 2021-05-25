@@ -6,7 +6,7 @@ import platform
 system = platform.platform()
 
 if 'Linux' in system:
-    tmp = "/tmp"
+    tmp = "/home/user"
     slashes = '/'
 if 'Windows' in system:
     tmp = os.environ.get('TMP')
