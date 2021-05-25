@@ -71,14 +71,14 @@ i = 1
 # voreinstellung der browser-fenster-höhen
 # da bei scrollbarem chatverlauf unerwünschte effekte auftreten wie das nicht alle chats mitgenommen werden
 # browserseitiges Zoomen ist nicht zu empfehlen da dadurch .click() nicht jeden nutzer mitnimmt und das script mit den usern durcheinander kommt
-# (werte händisch ermittelt)
-chrome_hoehe = 121
-header_hoehe = 59
-offline_banner = 107
-sucher_hoehe = 49
-archive_hoehe = 49
+browser.set_window_size(0, 0) # verkleinerung auf 0 um wirkliche Windowgröße zu ermitteln mit nachfolgendem browser.get_window_size().get("height")
+chrome_hoehe = browser.get_window_size().get("height")
+header_hoehe = browser.find_element_by_xpath(left_sidebar_all_xpath + "/header").rect.get("height")
+offline_banner = 107 # bleibt erst mal hardgecocodet da eine parametrisierung zwar möglich aber wenig sinnvoll ist
+sucher_hoehe = browser.find_element_by_xpath(left_sidebar_all_xpath + "/div[1]").rect.get("height")
+archive_hoehe = browser.find_element_by_xpath(archiviert_xpath).rect.get("height")
 gesamt_vor_hoehe = chrome_hoehe + header_hoehe + offline_banner + sucher_hoehe + archive_hoehe
-chat_hoehe = 73
+chat_hoehe = browser.find_element_by_xpath(chatlist_xpath + "/div[1]").rect.get("height")
 browser.set_window_size(600, gesamt_vor_hoehe + chat_hoehe * nutzeranzahl)
 
 print("--------------------------------")
