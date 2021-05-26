@@ -4,7 +4,7 @@ from selenium.webdriver.chrome.options import Options
 import os
 import platform
 system = platform.platform()
-
+driverpath = "/home/user/Schreibtisch/ChromeDriver_91.0.4472.19/chromedriver"
 if 'Linux' in system:
     tmp = "/home/user"
     slashes = '/'
@@ -37,7 +37,7 @@ def webdriver_win():
 def webdriver_linux():
     options = webdriver.ChromeOptions()
     options.add_experimental_option("debuggerAddress", "127.0.0.1:9222")
-    browser = webdriver.Chrome(options=options, executable_path="/home/user/Schreibtisch/ChromeDriver_90.0.4430.24/chromedriver")
+    browser = webdriver.Chrome(options=options, executable_path=driverpath)
     return browser
 if 'Linux' in system:
     browser = webdriver_linux()
