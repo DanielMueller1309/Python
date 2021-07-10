@@ -233,17 +233,18 @@ def main():
             module.exit_json(**result)
 
     # if there is no matching entry, create a new one
-    #password = generate_password(module, entry_password_length)
-    password = entry_password
+     password = entry_password
     if not module.check_mode:
         try:
-            set_password(module, kp, username, title, password)
+            create_entry(module, kp, username, title, password, notes)
         except:
             KEEPASS_SAVE_ERR = traceback.format_exc()
             module.fail_json(msg='Could not add the entry or save the database.', exception=KEEPASS_SAVE_ERR)
 
+    result['title'] = title
     result['username'] = username
     result['password'] = password
+    result['notes']    = notes
     result['changed'] = True
 
     # in the event of a successful module execution, you will want to
@@ -273,7 +274,7 @@ def get_password(module, kp, username, title):
     entry = kp.find_entries(title=title, first=True)
 
     if (entry):
-        return (entry.username, entry.password)
+        return (entry.title, entry.username, entry.password, entry.url, entry.notes, entry.expiry_time, entry.tags,  entry.icon) #
     else:
         return None
 
