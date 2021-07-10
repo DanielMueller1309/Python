@@ -37,21 +37,15 @@ options:
         required: true
         type: str
 
-    hostname:
-        description:
-            - Hostname, will be used for the title of the entry. Leave this blank for host-independent entries.
-        required: false
-        type: str
-
     keyfile:
         description:
             - Path of the keepass keyfile. Either this or 'password' (or both) are required.
         required: false
         type: str
 
-    purpose:
+    title:
         description:
-            - Purpose, will be used for the title of the entry.
+            - title, will be used for the title of the entry.
         required: true
         type: str
 
@@ -61,13 +55,13 @@ options:
         required: true
         type: str
 
-    password:
+    db_password:
         description:
             - Path of the keepass keyfile. Either this or 'keyfile' (or both) are required.
         required: false
         type: str
 
-    password_length:
+    entry_password_length:
         description:
             - The length of the generated passwords. Defaults to 30 characters.
         required: false
@@ -81,9 +75,8 @@ EXAMPLES = '''
 - name: Create a new password, or get the existing item
   keepass:
     database: /tmp/vault.kdbx
-    hostname: dbhost01.localdomain
     keyfile: /tmp/vault.key
-    purpose: MariaDB
+    title: MariaDB
     username: mariadb-admin
   register: creds
 - debug:
@@ -92,10 +85,9 @@ EXAMPLES = '''
 - name: Create a longer new password, or get the existing item
   keepass:
     database: /tmp/vault.kdbx
-    hostname: "{{ inventory_hostname }}"
     keyfile: /tmp/vault.key
-    password_length: 45
-    purpose: MariaDB
+    entry_password_length: 45
+    title: MariaDB
     username: mariadb-admin
   register: creds
 - debug:
@@ -105,8 +97,8 @@ EXAMPLES = '''
   keepass:
     database: /tmp/vault.kdbx
     keyfile: /tmp/vault.key
-    password_length: 45
-    purpose: MariaDB
+    entry_password_length: 45
+    title: MariaDB
     username: mariadb-admin
   register: creds
 - debug:
@@ -142,12 +134,12 @@ def main():
     # define available arguments/parameters a user can pass to the module
     module_args = dict(
         database=dict(type='str', required=True),
-        hostname=dict(type='str', required=False),
         keyfile=dict(type='str', required=False, default=None),
-        password=dict(type='str', required=False, default=None, no_log=True),
-        password_length=dict(type='int', required=False, default=30, no_log=False),
-        purpose=dict(type='str', required=True),
+        db_password=dict(type='str', required=False, default=None, no_log=True),
+        entry_password_length=dict(type='int', required=False, default=30, no_log=False),
+        title=dict(type='str', required=True),
         username=dict(type='str', required=True),
+        entry_password=dict(type='str', required=False, default=None),
     )
 
     # seed the result dict in the object
@@ -158,7 +150,7 @@ def main():
     result = dict(
         changed=False,
         username='',
-        password=''
+        entry_password=''
     )
 
     # the AnsibleModule object will be our abstraction working with Ansible
@@ -174,18 +166,17 @@ def main():
         module.fail_json(msg=missing_required_lib("pykeepass"), exception=PYKEEPASS_IMP_ERR)
 
     database        = module.params['database']
-    hostname        = module.params['hostname']
     keyfile         = module.params['keyfile']
-    password        = module.params['password']
-    password_length = module.params['password_length']
-    purpose         = module.params['purpose']
+    db_password        = module.params['db_password']
+    entry_password_length = module.params['entry_password_length']
+    title         = module.params['title']
     username        = module.params['username']
-
-    if not password and not keyfile:
+    entry_password  = module.params['entry_password']
+    if not db_password and not keyfile:
         module.fail_json(msg="Either 'password' or 'keyfile' (or both) are required.")
 
     try:
-        kp = PyKeePass(database, password=password, keyfile=keyfile)
+        kp = PyKeePass(database, password=db_password, keyfile=keyfile)
     except IOError as e:
         KEEPASS_OPEN_ERR = traceback.format_exc()
         module.fail_json(msg='Could not open the database or keyfile.')
@@ -194,7 +185,7 @@ def main():
         module.fail_json(msg='Could not open the database. Credentials are wrong or integrity check failed')
 
     # try to get the entry from the database
-    entry = get_password(module, kp, hostname, username, purpose)
+    entry = get_password(module, kp, username, title)
     if entry:
         entry_username, entry_password = entry
         if entry_username == username:
@@ -203,10 +194,11 @@ def main():
             module.exit_json(**result)
 
     # if there is no matching entry, create a new one
-    password = generate_password(module, password_length)
+    #password = generate_password(module, entry_password_length)
+    password = entry_password
     if not module.check_mode:
         try:
-            set_password(module, kp, hostname, username, purpose, password)
+            set_password(module, kp, username, title, password)
         except:
             KEEPASS_SAVE_ERR = traceback.format_exc()
             module.fail_json(msg='Could not add the entry or save the database.', exception=KEEPASS_SAVE_ERR)
@@ -232,20 +224,14 @@ def generate_password(module, length):
     return password
 
 
-def set_password(module, kp, hostname, username, purpose, password):
-    if hostname:
-        kp.add_entry(kp.root_group, hostname + ' - ' + purpose, username, password, icon='47', notes='Generated by ansible.')
-    else:
-        kp.add_entry(kp.root_group, purpose, username, password, icon='47', notes='Generated by ansible.')
-
+def set_password(module, kp, username, title, password):
+    kp.add_entry(kp.root_group, title, username, password, icon='47', notes='Generated by ansible.')
     kp.save()
 
 
-def get_password(module, kp, hostname, username, purpose):
-    if hostname:
-        entry = kp.find_entries(title=hostname + ' - ' + purpose, first=True)
-    else:
-        entry = kp.find_entries(title=purpose, first=True)
+def get_password(module, kp, username, title):
+
+    entry = kp.find_entries(title=title, first=True)
 
     if (entry):
         return (entry.username, entry.password)
@@ -255,12 +241,3 @@ def get_password(module, kp, hostname, username, purpose):
 
 if __name__ == '__main__':
     main()
-from pykeepass import PyKeePass
-# load database
-kp = PyKeePass(r'C:\Users\danie\Git\ansible\ansible_home\test_db.kdbx', password='hallowelt')
-group = kp.groups
-#kp.add_entry(destination_group='test_db',title='testentry', username='testusername', password='testpw')
-#kp.add_group(kp.root_group, 'test_addgroup')
-kp.add_entry(destination_group=group[2], title='testentry', username='testusername', password='testpw')
-kp.save()
-print('ende')
