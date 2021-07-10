@@ -195,12 +195,41 @@ def main():
         module.fail_json(msg='Could not open the database. Credentials are wrong or integrity check failed')
 
     # try to get the entry from the database
-    entry = get_password(module, kp, username, title)
-    if entry:
-        entry_username, entry_password = entry
-        if entry_username == username:
-            result['username'] = entry_username
-            result['password'] = entry_password
+    db_entry = get_entry(module, kp, title)
+    user_entry = (title, username, entry_password, url, notes, expiry_time, tags, icon)
+    parameter = ('entry.title', 'entry.username','entry.password', 'entry.url', 'entry.notes', 'entry.expiry_time', 'entry.tags', 'entry.icon')
+    parameter_name = ('title', 'username', 'password', 'url', 'notes', 'expiry_time', 'tags', 'icon')
+    if db_entry:
+        if db_entry[0] == title:
+            x = range(1, len(db_entry), 1)
+            for i in x:
+                if user_entry[i] != db_entry[i]:
+                    set_param(parameter[i],parameter_name, module, kp, title, username,entry_password, url, notes, expiry_time, tags, icon)
+#
+#            if entry_password != db_entry_password:
+ #               set_entry_password(module, kp, title, entry_password)
+#
+ #           if notes != db_entry_notes:
+  #              set_notes(module, kp, title, notes)
+#
+ #           if expiry_time != db_entry_expiry_time:
+  #              set_expiry_time(module, kp, title, tags)
+#
+ #           if tags != db_entry_tags:
+  #              set_tags(module, kp, title, tags)
+#
+ #           if icon != db_entry_expiry_time:
+  #              set_icon(module, kp, title, icon)
+#
+            db_entry_title, db_entry_username, db_entry_password, db_entry_url, db_entry_notes, db_entry_expiry_time, db_entry_tags, db_entry_icon = db_entry
+            result['title'] = db_entry_title
+            result['username'] = db_entry_username
+            result['password'] = db_entry_password
+            result['url'] = db_entry_url
+            result['notes'] = db_entry_notes
+            result['expiry_time'] = str(db_entry_expiry_time)
+            result['tags'] = db_entry_tags
+            result['icon'] = str(db_entry_icon)
             module.exit_json(**result)
 
     # if there is no matching entry, create a new one
