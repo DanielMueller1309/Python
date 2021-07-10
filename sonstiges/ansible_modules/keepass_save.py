@@ -140,6 +140,11 @@ def main():
         title=dict(type='str', required=True),
         username=dict(type='str', required=True),
         entry_password=dict(type='str', required=False, default=None),
+        notes=dict(type='str', required=False, default=None),
+        expiry_time=dict(type='str', required=False, default=None),
+        tags=dict(type='str', required=False, default=None),
+        icon=dict(type='str', required=False, default=None),
+        url=dict(type='str', required=False, default=None),
     )
 
     # seed the result dict in the object
@@ -172,6 +177,11 @@ def main():
     title         = module.params['title']
     username        = module.params['username']
     entry_password  = module.params['entry_password']
+    notes           = module.params['notes']
+    expiry_time     = module.params['expiry_time']
+    tags            = module.params['tags']
+    icon            = module.params['icon']
+    url             = module.params['url']
     if not db_password and not keyfile:
         module.fail_json(msg="Either 'password' or 'keyfile' (or both) are required.")
 
