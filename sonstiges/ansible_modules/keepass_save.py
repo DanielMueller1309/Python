@@ -163,7 +163,7 @@ def main():
     username        = module.params['username']
     entry_password  = module.params['entry_password']
     notes           = module.params['notes']
-    expiry_time     = module.params['expiry_time']
+    #expiry_time     = module.params['expiry_time']
     tags            = module.params['tags']
     icon            = module.params['icon']
     url             = module.params['url']
@@ -181,9 +181,9 @@ def main():
 
     # try to get the entry from the database
     db_entry = get_entry(module, kp, title)
-    user_entry = (title, username, entry_password, url, notes, expiry_time, tags, icon)
-    parameter = ('entry.title', 'entry.username','entry.password', 'entry.url', 'entry.notes', 'entry.expiry_time', 'entry.tags', 'entry.icon')
-    parameter_name = ('title', 'username', 'password', 'url', 'notes', 'expiry_time', 'tags', 'icon')
+    #user_entry = (title, username, entry_password, url, notes, expiry_time, tags, icon)
+    #parameter = ('entry.title', 'entry.username','entry.password', 'entry.url', 'entry.notes', 'entry.expiry_time', 'entry.tags', 'entry.icon')
+    #parameter_name = ('title', 'username', 'password', 'url', 'notes', 'expiry_time', 'tags', 'icon')
     if db_entry:
         if db_entry[0] == title:
             #x = range(1, len(db_entry), 1)
@@ -231,7 +231,7 @@ def main():
             module.exit_json(**result)
 
     # if there is no matching entry, create a new one
-     password = entry_password
+    #password = entry_password
     if not module.check_mode:
         try:
             create_entry(module, kp, username, title, password, notes)
