@@ -125,7 +125,6 @@ def main():
         database=dict(type='str', required=True),
         keyfile=dict(type='str', required=False, default=None),
         db_password=dict(type='str', required=False, default=None, no_log=True),
-        entry_password_length=dict(type='int', required=False, default=30, no_log=False),
         title=dict(type='str', required=True),
         username=dict(type='str', required=True),
         entry_password=dict(type='str', required=False, default=None),
@@ -143,8 +142,6 @@ def main():
     # for consumption, for example, in a subsequent task
     result = dict(
         changed=False,
-        username='',
-        entry_password=''
     )
 
     # the AnsibleModule object will be our abstraction working with Ansible
@@ -162,7 +159,6 @@ def main():
     database        = module.params['database']
     keyfile         = module.params['keyfile']
     db_password        = module.params['db_password']
-    entry_password_length = module.params['entry_password_length']
     title         = module.params['title']
     username        = module.params['username']
     entry_password  = module.params['entry_password']
