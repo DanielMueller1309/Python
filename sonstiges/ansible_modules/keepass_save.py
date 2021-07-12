@@ -186,35 +186,48 @@ def main():
     parameter_name = ('title', 'username', 'password', 'url', 'notes', 'expiry_time', 'tags', 'icon')
     if db_entry:
         if db_entry[0] == title:
-            x = range(1, len(db_entry), 1)
-            for i in x:
-                if user_entry[i] != db_entry[i]:
-                    set_param(parameter[i],parameter_name, module, kp, title, username,entry_password, url, notes, expiry_time, tags, icon)
-#
-#            if entry_password != db_entry_password:
- #               set_entry_password(module, kp, title, entry_password)
-#
- #           if notes != db_entry_notes:
-  #              set_notes(module, kp, title, notes)
-#
- #           if expiry_time != db_entry_expiry_time:
-  #              set_expiry_time(module, kp, title, tags)
-#
- #           if tags != db_entry_tags:
-  #              set_tags(module, kp, title, tags)
-#
- #           if icon != db_entry_expiry_time:
-  #              set_icon(module, kp, title, icon)
-#
+            #x = range(1, len(db_entry), 1)
+            #for i in x:
+            #    if user_entry[i] != db_entry[i]:
+            #        set_param(parameter[i],parameter_name, module, kp, title, username,entry_password, url, notes, expiry_time, tags, icon)
             db_entry_title, db_entry_username, db_entry_password, db_entry_url, db_entry_notes, db_entry_expiry_time, db_entry_tags, db_entry_icon = db_entry
-            result['title'] = db_entry_title
-            result['username'] = db_entry_username
-            result['password'] = db_entry_password
-            result['url'] = db_entry_url
-            result['notes'] = db_entry_notes
-            result['expiry_time'] = str(db_entry_expiry_time)
-            result['tags'] = db_entry_tags
-            result['icon'] = str(db_entry_icon)
+            result['changed'] = False
+            if username != db_entry_username:
+                set_username(module, kp, title, username)
+                result['new_username'] = username
+                result['changed'] = True
+
+            if entry_password != db_entry_password:
+                set_entry_password(module, kp, title, entry_password)
+                result['new_password'] = entry_password
+                result['changed'] = True
+
+            if notes != db_entry_notes :
+                set_notes(module, kp, title, notes)
+                result['new_notes'] = notes
+                result['changed'] = True
+
+            if url != db_entry_url:
+                set_url(module, kp, title, url)
+                result['new_url'] = url
+                result['changed'] = True
+
+            #if expiry_time is not db_entry_expiry_time and str(module_args['icon'].get('default')):
+            #    set_expiry_time(module, kp, title, expiry_time)
+            #    result['expiry_time'] = expiry_time
+            #    result['changed'] = True
+
+            if tags != db_entry_tags:
+                set_tags(module, kp, title, tags)
+                result['new_tags'] = tags
+                result['changed'] = True
+
+            if str(icon) != str(db_entry_icon):
+                set_icon(module, kp, title, icon)
+                result['new_icon'] = str(icon)
+                result['changed'] = True
+
+
             module.exit_json(**result)
 
     # if there is no matching entry, create a new one
@@ -251,36 +264,41 @@ def main():
 def create_entry(module, kp, username, title, password, notes):
     kp.add_entry(kp.root_group, title, username, password, icon='47', notes=notes)
     kp.save()
-# set specific stuff (here to change laiter is the group to a new module param)
-#def set_username(module, kp, title, username):
- #   entry = get_username(module, kp, title, username)
-  #  entry.username = username
-   # kp.save()
+#set specific stuff (here to change later is the group to a new module param)
+def set_username(module, kp, title, username):
+    entry = kp.find_entries(title=title, first=True)
+    entry.username = username
+    kp.save()
 
-#def set_entry_password(module, kp, title, password):
- #   kp.add_entry(kp.root_group, title, password=password)
-  #  kp.save()
+def set_entry_password(module, kp, title, entry_password):
+    entry = kp.find_entries(title=title, first=True)
+    entry.password = entry_password
+    kp.save()
 
-#def set_url(module, kp, title, url):
-#
- #   kp.add_entry(kp.root_group, title, url=url)
-  #  kp.save()
+def set_url(module, kp, title, url):
+    entry = kp.find_entries(title=title, first=True)
+    entry.url = url
+    kp.save()
 
-#def set_notes(module, kp, title, notes):
- #   kp.add_entry(kp.root_group, title, notes=notes)
-  #  kp.save()
+def set_notes(module, kp, title, notes):
+    entry = kp.find_entries(title=title, first=True)
+    entry.notes = notes
+    kp.save()
 
-#def set_expiry_time(module, kp, title, expiry_time):
- #   kp.add_entry(kp.root_group, title, expiry_time=expiry_time)
-  #  kp.save()
+def set_expiry_time(module, kp, title, expiry_time):
+    entry = kp.find_entries(title=title, first=True)
+    entry.expiry_time = expiry_time
+    kp.save()
 
-#def set_tags(module, kp, title, tags):
- #    kp.add_entry(kp.root_group, title, tags=tags)
-  #   kp.save()
+def set_tags(module, kp, title, tags):
+    entry = kp.find_entries(title=title, first=True)
+    entry.tags = tags
+    kp.save()
 
-#def set_icon(module, kp, title, icon):
- #   kp.add_entry(kp.root_group, title, notes=icon)
-  #  kp.save()
+def set_icon(module, kp, title, icon):
+    entry = kp.find_entries(title=title, first=True)
+    entry.icon = str(icon)
+    kp.save()
 
 def set_param(param, parameter_name, module, kp, title, username,entry_password, url, notes, expiry_time, tags, icon):
     entry = get_param(param, module, kp, title)
@@ -299,40 +317,40 @@ def get_entry(module, kp, title):
 
 # give back specific stuff in list:  (entry.title, entry.parameter)
 
-#def get_username(module, kp, title, username):
- #   entry = kp.find_entries(title=title, first=True)
-  #  if (entry):
-   #     return (entry.username)
+def get_username(module, kp, title, username):
+    entry = kp.find_entries(title=title, first=True)
+    if (entry):
+        return (entry.username)
 
-#def get_password(module, kp, title, password):
- #   entry = kp.find_entries(title=title, first=True)
-  #  if (entry):
-   #     return (entry.password)
+def get_password(module, kp, title, password):
+    entry = kp.find_entries(title=title, first=True)
+    if (entry):
+        return (entry.password)
 
-#def get_url(module, kp, title, url):
-  #  entry = kp.find_entries(title=title, first=True)
-   # if (entry):
-    #    return (entry.url)
+def get_url(module, kp, title, url):
+    entry = kp.find_entries(title=title, first=True)
+    if (entry):
+        return (entry.url)
 
-#def get_notes(module, kp, title, notes):
- #   entry = kp.find_entries(title=title, first=True)
-  #  if (entry):
-   #     return (entry.notes)
+def get_notes(module, kp, title, notes):
+    entry = kp.find_entries(title=title, first=True)
+    if (entry):
+        return (entry.notes)
 
-#def get_expiry_time(module, kp, title, expiry_time):
- #   entry = kp.find_entries(title=title, first=True)
-  #  if (entry):
-   #     return (entry.expiry_time)
+def get_expiry_time(module, kp, title, expiry_time):
+    entry = kp.find_entries(title=title, first=True)
+    if (entry):
+        return (entry.expiry_time)
 
-#def get_tags(module, kp, title, tags):
- #   entry = kp.find_entries(title=title, first=True)
-  #  if (entry):
-   #     return (entry.tags)
+def get_tags(module, kp, title, tags):
+    entry = kp.find_entries(title=title, first=True)
+    if (entry):
+        return (entry.tags)
 
-#def get_icon(module, kp, title, icon):
- #   entry = kp.find_entries(title=title, first=True)
-  #  if (entry):
-   #     return (entry.icon)
+def get_icon(module, kp, title, icon):
+    entry = kp.find_entries(title=title, first=True)
+    if (entry):
+        return (entry.icon)
 
 def get_param(param, module, kp, title):
     entry = kp.find_entries(title=title, first=True)
