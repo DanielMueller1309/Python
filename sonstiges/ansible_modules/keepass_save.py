@@ -127,11 +127,11 @@ def main():
         db_password=dict(type='str', required=False, default=None, no_log=True),
         title=dict(type='str', required=True),
         username=dict(type='str', required=True),
-        entry_password=dict(type='str', required=False, default=None),
-        notes=dict(type='str', required=False, default=None),
-        expiry_time=dict(type='str', required=False, default=None),
+        entry_password=dict(type='str', required=False, default=None, no_log=True),
+        notes=dict(type='str', required=False, default='This Entry is Ansible Managed'),
+        #expiry_time=dict(type='str', required=False, default=None),
         tags=dict(type='str', required=False, default=None),
-        icon=dict(type='str', required=False, default=None),
+        icon=dict(type='int', required=False, default=47),
         url=dict(type='str', required=False, default=None),
     )
 
