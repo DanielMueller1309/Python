@@ -175,7 +175,7 @@ def main():
     except IOError as e:
         KEEPASS_OPEN_ERR = traceback.format_exc()
         module.fail_json(msg='Could not open the database or keyfile.')
-    except CredentialsIntegrityError as e:
+    except FileNotFoundError:
         KEEPASS_OPEN_ERR = traceback.format_exc()
         module.fail_json(msg='Could not open the database. Credentials are wrong or integrity check failed')
 
