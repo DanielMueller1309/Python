@@ -249,18 +249,6 @@ def main():
     # simple AnsibleModule.exit_json(), passing the key/value results
     module.exit_json(**result)
 
-#old pw generator --out of use-- @ the moment
-#def generate_password(module, length):
-#    import string
-#    alphabet = string.ascii_letters + string.digits
-#    try:
-#        import secrets as random
-#    except ImportError:
-#        import random
-#
- #   password = ''.join(random.choice(alphabet) for i in range(length))
-  #  return password
-#
 def create_entry(module, kp, username, title, password, notes):
     kp.add_entry(kp.root_group, title, username, password, icon='47', notes=notes)
     kp.save()
