@@ -60,49 +60,38 @@ options:
             - Path of the keepass keyfile. Either this or 'keyfile' (or both) are required.
         required: false
         type: str
-
-    entry_password_length:
+    notes:
         description:
-            - The length of the generated passwords. Defaults to 30 characters.
-        required: false
-        type: int
-
+            - this param is the most important one (sacasm) he gives us the the space for notes
+        defaults:
+            - 'This Entry is Ansible Managed'
+    tags:
+        description:
+            - to tag something you can fill up the field in the kdbx file
+    icon:
+        description:
+            - to specifi somethin for the eys to see with the default icon which entry is ansible manged
+        defaults:
+            - '47'
+    url: 
+        description:
+        - to fill the url field in kdbx file
 author:
-    - Linuxfabrik GmbH, Zurich, Switzerland, https://www.linuxfabrik.ch
+    - DanielMueller1309 https://github.com/DanielMueller1309
 '''
 
 EXAMPLES = '''
-- name: Create a new password, or get the existing item
+- name: Add entry or change existung one
   keepass:
     database: /tmp/vault.kdbx
     keyfile: /tmp/vault.key
-    title: MariaDB
-    username: mariadb-admin
-  register: creds
-- debug:
-    msg: "Username: {{ creds.username }}, Password: {{ creds.password }}, New password: {{ creds.changed }}"
-
-- name: Create a longer new password, or get the existing item
-  keepass:
-    database: /tmp/vault.kdbx
-    keyfile: /tmp/vault.key
-    entry_password_length: 45
-    title: MariaDB
-    username: mariadb-admin
-  register: creds
-- debug:
-    msg: "Username: {{ creds.username }}, Password: {{ creds.password }}, New password: {{ creds.changed }}"
-
-- name: Create a new, host-independent password, or get the existing item
-  keepass:
-    database: /tmp/vault.kdbx
-    keyfile: /tmp/vault.key
-    entry_password_length: 45
-    title: MariaDB
-    username: mariadb-admin
-  register: creds
-- debug:
-    msg: "Username: {{ creds.username }}, Password: {{ creds.password }}, New password: {{ creds.changed }}"
+    title: storage_admin
+    username: admin-user
+    entry_password: hallowelt
+    notes: 'That´s themse to be the the incredibly place, the space for notes '
+    tags: keepass_managed
+    icon: 30
+    url: 'https://pornhub.com'    
 '''
 
 RETURN = '''
