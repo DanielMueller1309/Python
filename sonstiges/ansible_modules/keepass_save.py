@@ -234,16 +234,16 @@ def main():
     #password = entry_password
     if not module.check_mode:
         try:
-            create_entry(module, kp, username, title, password, notes)
+            create_entry(module, kp, username, title, entry_password, notes, tags, icon, url)
         except:
             KEEPASS_SAVE_ERR = traceback.format_exc()
             module.fail_json(msg='Could not add the entry or save the database.', exception=KEEPASS_SAVE_ERR)
 
-    result['title'] = title
-    result['username'] = username
-    result['password'] = password
-    result['notes']    = notes
-    result['changed'] = True
+    result['title']             = title
+    result['username']          = username
+    result['entry_password']    = entry_password
+    result['notes']             = notes
+    result['changed']           = True
 
     # in the event of a successful module execution, you will want to
     # simple AnsibleModule.exit_json(), passing the key/value results
