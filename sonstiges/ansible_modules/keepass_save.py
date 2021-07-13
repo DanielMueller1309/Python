@@ -11,7 +11,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 ANSIBLE_METADATA = {
-    'metadata_version': '1.1',
+    'metadata_version': '1.0',
     'status': ['preview'],
     'supported_by': 'community'
 }
@@ -22,10 +22,10 @@ module: keepass
 
 short_description: This a module to interact with a keepass (kdbx) database.
 
-version_added: "2.7"
+version_added: "1.0"
 
 description:
-    - "This a module to interact with a keepass (kdbx) database."
+    - "This a module to interact with a keepass (kdbx) database. To save informatin into a kdbx file (exept  and icon, comming soon)"
 
 requirements:
     - PyKeePass
@@ -60,58 +60,49 @@ options:
             - Path of the keepass keyfile. Either this or 'keyfile' (or both) are required.
         required: false
         type: str
-
-    entry_password_length:
+        
+    notes:
         description:
-            - The length of the generated passwords. Defaults to 30 characters.
-        required: false
-        type: int
-
+            - this param is the most important one (sacasm) he gives us the the space for notes
+        defaults:
+            - 'This Entry is Ansible Managed'
+            
+    icon:
+        description:
+            - to specifi somethin for the eys to see with the default icon which entry is ansible manged
+        defaults:
+            - '47'
+            
+    url: 
+        description:
+        - to fill the url field in kdbx file
+        
 author:
-    - Linuxfabrik GmbH, Zurich, Switzerland, https://www.linuxfabrik.ch
+    - DanielMueller1309 https://github.com/DanielMueller1309
 '''
 
 EXAMPLES = '''
-- name: Create a new password, or get the existing item
+- name: Add entry or change existung one
   keepass:
     database: /tmp/vault.kdbx
     keyfile: /tmp/vault.key
-    title: MariaDB
-    username: mariadb-admin
-  register: creds
-- debug:
-    msg: "Username: {{ creds.username }}, Password: {{ creds.password }}, New password: {{ creds.changed }}"
-
-- name: Create a longer new password, or get the existing item
-  keepass:
-    database: /tmp/vault.kdbx
-    keyfile: /tmp/vault.key
-    entry_password_length: 45
-    title: MariaDB
-    username: mariadb-admin
-  register: creds
-- debug:
-    msg: "Username: {{ creds.username }}, Password: {{ creds.password }}, New password: {{ creds.changed }}"
-
-- name: Create a new, host-independent password, or get the existing item
-  keepass:
-    database: /tmp/vault.kdbx
-    keyfile: /tmp/vault.key
-    entry_password_length: 45
-    title: MariaDB
-    username: mariadb-admin
-  register: creds
-- debug:
-    msg: "Username: {{ creds.username }}, Password: {{ creds.password }}, New password: {{ creds.changed }}"
+    title: storage_admin
+    username: admin-user
+    entry_password: hallowelt
+    notes: 'That´s themse to be the the incredibly place, the space for notes '
+    icon: 30
+    url: 'https://pornhub.com'    
 '''
 
 RETURN = '''
-username:
-    description: The original username that was passed in
+new_username:
+    description: the new username who is set by an existing entry
     type: str
-password:
-    description: The generated or retrieved password
+add_username:
+    description: the added username who is set by a new entry
     type: str
+
+P.S: this return statements are also available by every entry parameter who is changed or created
 '''
 import traceback
 
@@ -136,10 +127,14 @@ def main():
         database=dict(type='str', required=True),
         keyfile=dict(type='str', required=False, default=None),
         db_password=dict(type='str', required=False, default=None, no_log=True),
-        entry_password_length=dict(type='int', required=False, default=30, no_log=False),
         title=dict(type='str', required=True),
         username=dict(type='str', required=True),
-        entry_password=dict(type='str', required=False, default=None),
+        entry_password=dict(type='str', required=False, default=None, no_log=True),
+        notes=dict(type='str', required=False, default='This Entry is Ansible Managed'),
+        #expiry_time=dict(type='str', required=False, default=None),
+        #tags=dict(type='str', required=False, default=None),
+        icon=dict(type='int', required=False, default=47),
+        url=dict(type='str', required=False, default=None),
     )
 
     # seed the result dict in the object
@@ -149,8 +144,6 @@ def main():
     # for consumption, for example, in a subsequent task
     result = dict(
         changed=False,
-        username='',
-        entry_password=''
     )
 
     # the AnsibleModule object will be our abstraction working with Ansible
@@ -168,10 +161,14 @@ def main():
     database        = module.params['database']
     keyfile         = module.params['keyfile']
     db_password        = module.params['db_password']
-    entry_password_length = module.params['entry_password_length']
     title         = module.params['title']
     username        = module.params['username']
     entry_password  = module.params['entry_password']
+    notes           = module.params['notes']
+    #expiry_time     = module.params['expiry_time']
+    #tags            = module.params['tags']
+    icon            = module.params['icon']
+    url             = module.params['url']
     if not db_password and not keyfile:
         module.fail_json(msg="Either 'password' or 'keyfile' (or both) are required.")
 
@@ -180,64 +177,177 @@ def main():
     except IOError as e:
         KEEPASS_OPEN_ERR = traceback.format_exc()
         module.fail_json(msg='Could not open the database or keyfile.')
-    except CredentialsIntegrityError as e:
+    except FileNotFoundError:
         KEEPASS_OPEN_ERR = traceback.format_exc()
         module.fail_json(msg='Could not open the database. Credentials are wrong or integrity check failed')
 
     # try to get the entry from the database
-    entry = get_password(module, kp, username, title)
-    if entry:
-        entry_username, entry_password = entry
-        if entry_username == username:
-            result['username'] = entry_username
-            result['password'] = entry_password
+    db_entry = get_entry(module, kp, title)
+    #user_entry = (title, username, entry_password, url, notes, expiry_time, tags, icon)
+    #parameter = ('entry.title', 'entry.username','entry.password', 'entry.url', 'entry.notes', 'entry.expiry_time', 'entry.tags', 'entry.icon')
+    #parameter_name = ('title', 'username', 'password', 'url', 'notes', 'expiry_time', 'tags', 'icon')
+    if db_entry:
+        if db_entry[0] == title:
+            #x = range(1, len(db_entry), 1)
+            #for i in x:
+            #    if user_entry[i] != db_entry[i]:
+            #        set_param(parameter[i],parameter_name, module, kp, title, username,entry_password, url, notes, expiry_time, tags, icon)
+            db_entry_title, db_entry_username, db_entry_password, db_entry_url, db_entry_notes, db_entry_expiry_time, db_entry_tags, db_entry_icon = db_entry
+            result['changed'] = False
+            if username != db_entry_username:
+                set_username(module, kp, title, username)
+                result['new_username'] = username
+                result['changed'] = True
+
+            if entry_password != db_entry_password:
+                set_entry_password(module, kp, title, entry_password)
+                result['new_password'] = entry_password
+                result['changed'] = True
+
+            if notes != db_entry_notes :
+                set_notes(module, kp, title, notes)
+                result['new_notes'] = notes
+                result['changed'] = True
+
+            if url != db_entry_url:
+                set_url(module, kp, title, url)
+                result['new_url'] = url
+                result['changed'] = True
+
+            #if expiry_time is not db_entry_expiry_time and str(module_args['icon'].get('default')):
+            #    set_expiry_time(module, kp, title, expiry_time)
+            #    result['expiry_time'] = expiry_time
+            #    result['changed'] = True
+
+            #if str(tags) != str(db_entry_tags):
+            #    set_tags(module, kp, title, tags)
+            #    result['new_tags'] = tags
+            #    result['changed'] = True
+
+            if str(icon) != str(db_entry_icon):
+                set_icon(module, kp, title, icon)
+                result['new_icon'] = str(icon)
+                result['changed'] = True
+
+
             module.exit_json(**result)
 
     # if there is no matching entry, create a new one
-    #password = generate_password(module, entry_password_length)
-    password = entry_password
+    #password = entry_password
     if not module.check_mode:
         try:
-            set_password(module, kp, username, title, password)
+            create_entry(module, kp, username, title, entry_password, notes, icon, url)
         except:
             KEEPASS_SAVE_ERR = traceback.format_exc()
             module.fail_json(msg='Could not add the entry or save the database.', exception=KEEPASS_SAVE_ERR)
 
-    result['username'] = username
-    result['password'] = password
-    result['changed'] = True
+    result['add_title']             = title
+    result['add_username']          = username
+    result['add_entry_password']    = entry_password
+    result['add_notes']             = notes
+    result['add_icon'] = icon
+    result['add_url'] = url
+    result['changed']           = True
 
     # in the event of a successful module execution, you will want to
     # simple AnsibleModule.exit_json(), passing the key/value results
     module.exit_json(**result)
 
-
-def generate_password(module, length):
-    import string
-    alphabet = string.ascii_letters + string.digits
-    try:
-        import secrets as random
-    except ImportError:
-        import random
-
-    password = ''.join(random.choice(alphabet) for i in range(length))
-    return password
-
-
-def set_password(module, kp, username, title, password):
-    kp.add_entry(kp.root_group, title, username, password, icon='47', notes='Generated by ansible.')
+def create_entry(module, kp, username, title, password, notes, icon, url):
+    kp.add_entry(kp.root_group, title, username, password, icon=str(icon), notes=notes, url=url)
+    kp.save()
+#set specific stuff (here to change later is the group to a new module param)
+def set_username(module, kp, title, username):
+    entry = kp.find_entries(title=title, first=True)
+    entry.username = username
     kp.save()
 
+def set_entry_password(module, kp, title, entry_password):
+    entry = kp.find_entries(title=title, first=True)
+    entry.password = entry_password
+    kp.save()
 
-def get_password(module, kp, username, title):
+def set_url(module, kp, title, url):
+    entry = kp.find_entries(title=title, first=True)
+    entry.url = url
+    kp.save()
+
+def set_notes(module, kp, title, notes):
+    entry = kp.find_entries(title=title, first=True)
+    entry.notes = notes
+    kp.save()
+
+def set_expiry_time(module, kp, title, expiry_time):
+    entry = kp.find_entries(title=title, first=True)
+    entry.expiry_time = expiry_time
+    kp.save()
+
+def set_tags(module, kp, title, tags):
+    entry = kp.find_entries(title=title, first=True)
+    entry.tags = tags
+    kp.save()
+
+def set_icon(module, kp, title, icon):
+    entry = kp.find_entries(title=title, first=True)
+    entry.icon = str(icon)
+    kp.save()
+
+def set_param(param, parameter_name, module, kp, title, username,entry_password, url, notes, expiry_time, tags, icon):
+    entry = get_param(param, module, kp, title)
+    param = parameter_name
+    kp.save()
+
+#giveback all entry infos
+def get_entry(module, kp, title):
 
     entry = kp.find_entries(title=title, first=True)
 
     if (entry):
-        return (entry.username, entry.password)
+        return (entry.title, entry.username, entry.password, entry.url, entry.notes, entry.expiry_time, entry.tags,  entry.icon) #
     else:
         return None
 
+# give back specific stuff in list:  (entry.title, entry.parameter)
+
+def get_username(module, kp, title, username):
+    entry = kp.find_entries(title=title, first=True)
+    if (entry):
+        return (entry.username)
+
+def get_password(module, kp, title, password):
+    entry = kp.find_entries(title=title, first=True)
+    if (entry):
+        return (entry.password)
+
+def get_url(module, kp, title, url):
+    entry = kp.find_entries(title=title, first=True)
+    if (entry):
+        return (entry.url)
+
+def get_notes(module, kp, title, notes):
+    entry = kp.find_entries(title=title, first=True)
+    if (entry):
+        return (entry.notes)
+
+def get_expiry_time(module, kp, title, expiry_time):
+    entry = kp.find_entries(title=title, first=True)
+    if (entry):
+        return (entry.expiry_time)
+
+def get_tags(module, kp, title, tags):
+    entry = kp.find_entries(title=title, first=True)
+    if (entry):
+        return (entry.tags)
+
+def get_icon(module, kp, title, icon):
+    entry = kp.find_entries(title=title, first=True)
+    if (entry):
+        return (entry.icon)
+
+def get_param(param, module, kp, title):
+    entry = kp.find_entries(title=title, first=True)
+    if (entry):
+        return (param)
 
 if __name__ == '__main__':
     main()
