@@ -65,9 +65,7 @@ options:
             - this param is the most important one (sacasm) he gives us the the space for notes
         defaults:
             - 'This Entry is Ansible Managed'
-    tags:
-        description:
-            - to tag something you can fill up the field in the kdbx file
+            
     icon:
         description:
             - to specifi somethin for the eys to see with the default icon which entry is ansible manged
@@ -130,7 +128,7 @@ def main():
         entry_password=dict(type='str', required=False, default=None, no_log=True),
         notes=dict(type='str', required=False, default='This Entry is Ansible Managed'),
         #expiry_time=dict(type='str', required=False, default=None),
-        tags=dict(type='str', required=False, default=None),
+        #tags=dict(type='str', required=False, default=None),
         icon=dict(type='int', required=False, default=47),
         url=dict(type='str', required=False, default=None),
     )
@@ -164,7 +162,7 @@ def main():
     entry_password  = module.params['entry_password']
     notes           = module.params['notes']
     #expiry_time     = module.params['expiry_time']
-    tags            = module.params['tags']
+    #tags            = module.params['tags']
     icon            = module.params['icon']
     url             = module.params['url']
     if not db_password and not keyfile:
@@ -217,10 +215,10 @@ def main():
             #    result['expiry_time'] = expiry_time
             #    result['changed'] = True
 
-            if tags != db_entry_tags:
-                set_tags(module, kp, title, tags)
-                result['new_tags'] = tags
-                result['changed'] = True
+            #if str(tags) != str(db_entry_tags):
+            #    set_tags(module, kp, title, tags)
+            #    result['new_tags'] = tags
+            #    result['changed'] = True
 
             if str(icon) != str(db_entry_icon):
                 set_icon(module, kp, title, icon)
@@ -234,7 +232,7 @@ def main():
     #password = entry_password
     if not module.check_mode:
         try:
-            create_entry(module, kp, username, title, entry_password, notes, tags, icon, url)
+            create_entry(module, kp, username, title, entry_password, notes, icon, url)
         except:
             KEEPASS_SAVE_ERR = traceback.format_exc()
             module.fail_json(msg='Could not add the entry or save the database.', exception=KEEPASS_SAVE_ERR)
@@ -249,8 +247,8 @@ def main():
     # simple AnsibleModule.exit_json(), passing the key/value results
     module.exit_json(**result)
 
-def create_entry(module, kp, username, title, password, notes):
-    kp.add_entry(kp.root_group, title, username, password, icon='47', notes=notes)
+def create_entry(module, kp, username, title, password, notes, icon, url):
+    kp.add_entry(kp.root_group, title, username, password, icon=str(icon), notes=notes, url=url)
     kp.save()
 #set specific stuff (here to change later is the group to a new module param)
 def set_username(module, kp, title, username):
