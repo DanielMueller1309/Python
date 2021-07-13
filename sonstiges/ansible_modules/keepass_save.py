@@ -60,6 +60,7 @@ options:
             - Path of the keepass keyfile. Either this or 'keyfile' (or both) are required.
         required: false
         type: str
+        
     notes:
         description:
             - this param is the most important one (sacasm) he gives us the the space for notes
@@ -71,9 +72,11 @@ options:
             - to specifi somethin for the eys to see with the default icon which entry is ansible manged
         defaults:
             - '47'
+            
     url: 
         description:
         - to fill the url field in kdbx file
+        
 author:
     - DanielMueller1309 https://github.com/DanielMueller1309
 '''
@@ -87,7 +90,6 @@ EXAMPLES = '''
     username: admin-user
     entry_password: hallowelt
     notes: 'That´s themse to be the the incredibly place, the space for notes '
-    tags: keepass_managed
     icon: 30
     url: 'https://pornhub.com'    
 '''
@@ -239,10 +241,12 @@ def main():
             KEEPASS_SAVE_ERR = traceback.format_exc()
             module.fail_json(msg='Could not add the entry or save the database.', exception=KEEPASS_SAVE_ERR)
 
-    result['title']             = title
-    result['username']          = username
-    result['entry_password']    = entry_password
-    result['notes']             = notes
+    result['add_title']             = title
+    result['add_username']          = username
+    result['add_entry_password']    = entry_password
+    result['add_notes']             = notes
+    result['add_icon'] = icon
+    result['add_url'] = url
     result['changed']           = True
 
     # in the event of a successful module execution, you will want to
