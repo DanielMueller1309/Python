@@ -1,10 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
-# Author:  Linuxfabrik GmbH, Zurich, Switzerland
-# Contact: info (at) linuxfabrik (dot) ch
-#          https://www.linuxfabrik.ch/
-# License: The Unlicense, see LICENSE file.
+# Author:  DanielMueller1309
 
 # Make coding more python3-ish
 from __future__ import (absolute_import, division, print_function)
