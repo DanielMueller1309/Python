@@ -93,12 +93,14 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-username:
-    description: The original username that was passed in
+new_username:
+    description: the new username who is set by an existing entry
     type: str
-password:
-    description: The generated or retrieved password
+add_username:
+    description: the added username who is set by a new entry
     type: str
+
+P.S: this return statements are also available by every entry parameter who is changed or created
 '''
 import traceback
 
