@@ -25,7 +25,7 @@ short_description: This a module to interact with a keepass (kdbx) database.
 version_added: "1.0"
 
 description:
-    - "This a module to interact with a keepass (kdbx) database. To save informatin into a kdbx file (exept expire_time)"
+    - "This a module to interact with a keepass (kdbx) database. To save informatin into a kdbx file (exept  and icon, comming soon)"
 
 requirements:
     - PyKeePass
