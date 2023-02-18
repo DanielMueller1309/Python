@@ -1,8 +1,8 @@
-#reCAPTCHA
+# reCAPTCHA
 Die Problemstellung ist hierbei ein reCAPTCHA von google mit google spracherkennung zu lösen
 
-###Vorbereitung
-####Ablauf
+### Vorbereitung
+#### Ablauf
 1. Seite mit reCAPTCHA aufrufen
 1. Frame mit reCAPTCHA suchen
 1. warten
