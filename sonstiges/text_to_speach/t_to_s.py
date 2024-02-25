@@ -32,15 +32,15 @@ def api_call(text, key, voiceID):
   response = requests.post(url, json=data, headers=headers)
   return response
 
+def convert_to_mp3(response, output_path, CHUNK_SIZE = 1024):
+    with open('output.mp3', 'wb') as f:
+        for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
+            if chunk:
+                f.write(chunk)
 def main():
   data = import_json_as_dict("./api_keys.json")
   response = api_call(text, data["keys"][0], voice["Nicole"])
-
-  CHUNK_SIZE = 1024
-  with open('output.mp3', 'wb') as f:
-      for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
-          if chunk:
-              f.write(chunk)
+  convert_to_mp3(response, output_path="./output.mp3")
 
 if __name__ == "__main__":
     main()
