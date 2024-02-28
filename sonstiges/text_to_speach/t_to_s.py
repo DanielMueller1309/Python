@@ -1,6 +1,7 @@
 #!/usr/bin/env python3.8
 import requests
 import json
+from pydub import AudioSegment
 
 text = "Dieser Text hier ist zum testen der Sprachausgabe gedacht"
 voice = {
@@ -62,38 +63,46 @@ def convert_to_mp3(response, output_path, CHUNK_SIZE = 1024):
         for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
             if chunk:
                 f.write(chunk)
+
+# Define the function to merge mp3 files
+def merge_mp3_files(file_paths, output_path):
+    combined = AudioSegment.empty()  # Create an empty AudioSegment object
+
+    # Loop through each file in the list and append it to the `combined` AudioSegment
+    for file_path in file_paths:
+        current_audio = AudioSegment.from_mp3(file_path)  # Load the current MP3 file
+        combined += current_audio  # Append it to the combined AudioSegment
+
+    # Export the combined AudioSegment as an MP3 file
+    combined.export(output_path, format="mp3")
+
 def main():
   story = """
-Kapitel 1: Der Erwachte Wald
+Die Legende von Lindental: Felix und das Rätsel des Ewigen Brunnens
 
-In der tiefsten Dunkelheit des Erwachten Waldes, wo das Mondlicht nur spärlich durch die dichten Blätterkronen der uralten Bäume drang, erwachte etwas Altes. Etwas, das lange in den Tiefen der Erde geschlummert hatte, geweckt durch die sanften Gesänge der Waldnymphen und das ferne Echo eines Zauberworts, das durch die Nacht hallte.
+In einem kleinen Dorf namens Lindental, eingebettet zwischen sanften Hügeln und dichten Wäldern, lebte ein junger Mann namens Felix. Felix war bekannt für seine Abenteuerlust und seinen unermüdlichen Drang, die Welt zu erkunden. Trotz der Warnungen der Dorfbewohner, dass jenseits der Wälder Gefahren lauerten, träumte Felix davon, neue Orte zu entdecken und Geheimnisse zu enthüllen.
 
-Am Rand des Waldes, versteckt unter einem Baldachin aus dichtem Laub, lag das kleine Dorf Eldoria, dessen Bewohner von den Geheimnissen des Waldes umgeben lebten, doch selten dessen Schwelle überschritten. Die Legenden des Erwachten Waldes wurden von Generation zu Generation weitergegeben, Geschichten von verlorenen Städten, magischen Kreaturen und uralten Göttern, die in den Tiefen des Waldes schliefen.
+Eines Tages, als das Dorf in der warmen Mittagssonne döste, packte Felix seinen Rucksack, nahm seinen treuen Hund Max und verließ heimlich Lindental. Sein Ziel war der verbotene Wald, von dem die Alten sagten, er beherberge ein uraltes Geheimnis.
 
-In dieser Nacht, unter dem silbernen Schein des Vollmonds, machte sich eine junge Frau namens Lyra, die Tochter des Dorfschmieds, auf den Weg in den Wald. Trotz der Warnungen der Dorfältesten und der besorgten Blicke ihrer Familie fühlte Lyra sich von dem Wald angezogen, als würde etwas Unsichtbares, fast Vergessenes, sie zu sich rufen.
+Die Reise durch den Wald war nicht einfach. Dichtes Unterholz, steile Pfade und das unheimliche Echo unbekannter Tiere begleiteten Felix und Max. Doch Felix' Entschlossenheit wankte nicht. Nach Stunden des Wanderns erreichten sie eine Lichtung, in deren Mitte ein alter, verwitterter Turm stand.
 
-Bewaffnet mit nichts weiter als einer alten, von ihrem Vater geschmiedeten Laterne und einem kleinen Beutel voller Kräuter und Amulette, die sie von ihrer Großmutter geerbt hatte, betrat Lyra den Wald. Der Boden unter ihren Füßen war weich, bedeckt mit einem Teppich aus Moos und gefallenen Blättern, und mit jedem Schritt fühlte sie, wie die alte Magie des Waldes durch ihre Adern pulsierte.
+Fasziniert von der Struktur, beschloss Felix, den Turm zu erkunden. Die Tür war überraschend leicht zu öffnen, und im Inneren fanden sie eine Treppe, die in die Tiefe führte. Mit Fackeln ausgestattet, die sie am Eingang fanden, stiegen sie hinab.
 
-Tief im Herzen des Waldes angekommen, dort, wo die Bäume so hoch waren, dass ihre Spitzen die Sterne zu berühren schienen, fand Lyra eine Lichtung, die von einem sanften, bläulichen Licht erhellt wurde. In der Mitte der Lichtung stand ein alter Steinbrunnen, dessen Wasser in dem Mondlicht zu leuchten schien.
+Unten angekommen, fanden sie sich in einer großen Halle wieder, die mit Wandmalereien bedeckt war, die Geschichten von alten Königen, magischen Wesen und verborgenen Schätzen erzählten. In der Mitte der Halle stand ein alter Holztisch mit einem staubigen Buch darauf.
 
-Lyra spürte, dass dies der Ort war, zu dem sie gerufen worden war. Vorsichtig näherte sie sich dem Brunnen und blickte in das klare Wasser. Doch anstatt ihres eigenen Spiegelbildes sah sie Visionen von Ereignissen, die weit in der Vergangenheit lagen, und von Gesichtern, die sie nie gesehen hatte, aber dennoch irgendwie vertraut wirkten.
+Felix näherte sich vorsichtig und schlug das Buch auf. Es war ein Tagebuch, geschrieben von einem Magier namens Alaric, der vor Jahrhunderten gelebt hatte. Das Tagebuch erzählte von Alarics Suche nach der Quelle der ewigen Jugend, einem magischen Brunnen, der tief im Wald verborgen lag.
 
-Plötzlich wurde die Stille der Nacht von einem tiefen, grollenden Laut durchbrochen, der den Boden unter Lyras Füßen erzittern ließ. Aus den Schatten der Bäume trat eine Gestalt hervor, groß und furchteinflößend, mit Augen, die wie zwei glühende Kohlen in der Dunkelheit leuchteten.
+Getrieben von Neugier und dem Wunsch, sein Dorf zu beeindrucken, beschloss Felix, die Suche nach dem Brunnen fortzusetzen. Mit Hilfe der Hinweise aus dem Tagebuch machten sich Felix und Max auf den Weg durch den Wald, entschlossen, das Geheimnis zu lüften.
 
-Es war ein Wächter des Waldes, eines der alten Wesen, die seit Äonen die Geheimnisse des Waldes hüteten. Mit einer Stimme, die klang wie das Rauschen des Windes durch die Blätter, sprach der Wächter: "Wer wagt es, die Ruhe des Erwachten Waldes zu stören und die Geheimnisse der Alten zu erwecken?"
+Tage vergingen, während sie sich durch dichte Wälder und über Berge kämpften, immer den Anweisungen des Tagebuchs folgend. Schließlich, als sie fast die Hoffnung verloren hatten, stießen sie auf eine verborgene Schlucht, in deren Mitte ein glitzernder Brunnen stand.
 
-Lyra, obwohl von Furcht ergriffen, spürte eine unerklärliche Verbundenheit mit dem Wächter. Mit zitternder Stimme antwortete sie: "Ich bin Lyra, Tochter des Schmieds von Eldoria. Ich weiß nicht, was mich hierher geführt hat, aber ich spüre, dass es mein Schicksal ist, die Geheimnisse dieses Waldes zu ergründen."
+Felix konnte seinen Augen kaum trauen. Der Brunnen war wunderschön, umgeben von seltenen Blumen und leuchtenden Steinen. Er näherte sich vorsichtig und sah, wie das Wasser im Sonnenlicht funkelte. Als er seine Hand ins Wasser tauchte, spürte er eine Welle von Energie und Vitalität.
 
-Der Wächter betrachtete Lyra lange und durchdringend, bevor er schließlich sprach: "In dir fließt das Blut der Alten, Kind des Menschen. Du trägst eine große Bestimmung in dir, doch der Weg, den du zu beschreiten gedenkst, ist voller Gefahren und Prüfungen. Bist du bereit, dein Schicksal anzunehmen und die Geheimnisse zu enthüllen, die tief im Herzen des Erwachten Waldes verborgen liegen?"
+In diesem Moment erkannte Felix, dass die wahre Magie nicht im ewigen Leben lag, sondern in der Reise und den Erfahrungen, die er auf seinem Weg gesammelt hatte. Mit einem Lächeln im Gesicht und Max an seiner Seite machte er sich auf den Weg zurück nach Lindental, bereit, seine Geschichte zu teilen und die Dorfbewohner zu inspirieren, über den Tellerrand hinaus zu denken und ihre eigenen Abenteuer zu erleben.
 
-Lyra, deren Herz von einer Mischung aus Angst und Entschlossenheit erfüllt war, nickte. In diesem Moment wusste sie, dass ihr Leben nie wieder so sein würde wie zuvor. Sie war bereit, den Pfad zu beschreiten, der vor ihr lag, und die Geheimnisse des Erwachten Waldes zu lüften.
+Als Felix ins Dorf zurückkehrte, wurde er mit offenen Armen empfangen. Die Bewohner hörten gebannt zu, als er von seinen Abenteuern erzählte, und viele wurden von seinem Mut und seiner Entschlossenheit inspiriert. Felix hatte nicht nur das Geheimnis des verbotenen Waldes gelüftet, sondern auch das Herz seiner Mitmenschen berührt.
 
-Der Wächter hob seine mächtige Hand und berührte sanft Lyras Stirn. Ein warmes, goldenes Licht umhüllte sie, und sie spürte, wie die alte Magie des Waldes in sie eindrang, ihre Sinne schärfte und ihre Seele mit der Weisheit der Alten erfüllte.
-
-Mit neuen Kräften ausgestattet und vom Wächter des Waldes gesegnet, machte sich Lyra auf den Weg, um das Geheimnis ihrer Bestimmung zu entschlüsseln. Hinter ihr lag das Dorf Eldoria und das Leben, das sie kannte, vor ihr ein Abenteuer, das so alt war wie der Wald selbst.
-
-So beginnt die Reise von Lyra, der Tochter des Schmieds, in die Tiefen des Erwachten Waldes, auf der Suche nach Antworten und der Erfüllung ihres Schicksals. Was sie in den Schatten des Waldes finden wird, ist noch unbekannt, doch eines ist gewiss: Die Geschichte von Lyra und dem Erwachten Wald ist gerade erst begonnen.
-
+Von diesem Tag an wurde Felix als der Entdecker von Lindental gefeiert, und seine Geschichte wurde von Generation zu Generation weitererzählt. Der junge Mann, der einst davon geträumt hatte, die Welt zu erkunden, hatte gelernt, dass die größten Schätze oft in den Erfahrungen und den Beziehungen liegen, die wir auf unserer Reise durch das Leben sammeln.
   """
   splited_text =  teile_text(story)
   print(len(splited_text[0]))
@@ -105,10 +114,17 @@ So beginnt die Reise von Lyra, der Tochter des Schmieds, in die Tiefen des Erwac
     for key in data["keys"]:
       response = api_call(text, key, voice["Nicole"])
       if response.status_code == 200:
-        convert_to_mp3(response, output_path=f"./output_teil{index}.mp3")
+        if index in [5]:
+          convert_to_mp3(response, output_path=f"./felix_output_teil{index}.mp3")
         break
       else:
           f"Etwas ist schief gelaufen.\nresponse.status_code: {response.status_code }\nresponse.content:\n{response.content}"
+
+
+  #file_paths = [f'./felix_output_teil{i}.mp3' for i in range(1, 9)]
+  #output_path = "./felix_output_merged"
+  ## Merge the MP3 files
+  #merge_mp3_files(file_paths, output_path)
 
 if __name__ == "__main__":
     main()
