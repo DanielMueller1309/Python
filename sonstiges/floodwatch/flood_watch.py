@@ -13,11 +13,11 @@ url = 'https://www.pegelonline.wsv.de/gast/pegelinformationen?scrollPosition=0&g
 
 
 # load tor control port pw
-with open('password.json', 'r') as file:
+with open('./password.json', 'r') as file:
     control_port_password = json.load(file)
 
 # InfluxDB Konfigurationsdaten aus JSON-Datei lesen
-with open('influxdb_config.json', 'r') as file:
+with open('./influxdb_config.json', 'r') as file:
     influxdb_config = json.load(file)
 
 # Definiere die Proxies, die auf das Tor-Netzwerk verweisen.
