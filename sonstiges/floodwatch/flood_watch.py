@@ -7,17 +7,27 @@ from stem.control import Controller
 import json
 import influxdb_client
 from influxdb_client.client.write_api import SYNCHRONOUS
+import argparse
+
+
+# ArgumentParser erstellen
+parser = argparse.ArgumentParser(description="Dem flood_watch Skript können mehrere Argumtente übergeben werden")
+# Erforderliche Argumente hinzufügen
+parser.add_argument("-c", "--influxdb-config-file", type=str, default="./influxdb_config.json", help="Pfad zur Konfigurationsdatei.")
+parser.add_argument("-p", "--tor-password-file", type=str, default="./password.json", help="Pfad zur Passwortdatei.")
+# Argumente parsen
+args = parser.parse_args()
 
 # URL der Seite, von der wir Daten extrahieren möchten
 url = 'https://www.pegelonline.wsv.de/gast/pegelinformationen?scrollPosition=0&gewaesser=ELBE'
 
 
 # load tor control port pw
-with open('./password.json', 'r') as file:
+with open(f'{args.tor_password_file}', 'r') as file:
     control_port_password = json.load(file)
 
 # InfluxDB Konfigurationsdaten aus JSON-Datei lesen
-with open('./influxdb_config.json', 'r') as file:
+with open(f'{args.influxdb_config_file}', 'r') as file:
     influxdb_config = json.load(file)
 
 # Definiere die Proxies, die auf das Tor-Netzwerk verweisen.
