@@ -52,8 +52,9 @@ def call_pegel():
               if pegelname != 'Pegelname':
                   wasserstand = float(wasserstand_pnp)
                   extracted_data.append((pegelname, km, wasserstand))
-      for pegel, km, wasserstand in extracted_data:
-          print(f"{pegel}({km}km): {wasserstand}")
+      # for debug
+      #for pegel, km, wasserstand in extracted_data:
+      #    print(f"{pegel}({km}km): {wasserstand}")
       return extracted_data
 
 def push_to_influxdb(data):
@@ -75,7 +76,8 @@ def push_to_influxdb(data):
 
       # Datenpunkt schreiben
       write_api.write(bucket=influxdb_config['bucket'], org=influxdb_config['org'], record=p)
-      print(f"Written data: Location={location}({km}km), Wasserstand={wasserstand}cm")
+      # for debug
+      #print(f"Written data: Location={location}({km}km), Wasserstand={wasserstand}cm")
 
 
 def main():
