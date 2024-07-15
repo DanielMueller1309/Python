@@ -19,7 +19,7 @@ parser.add_argument("-p", "--tor-password-file", type=str, default="./password.j
 args = parser.parse_args()
 
 # URL der Seite, von der wir Daten extrahieren möchten
-url = 'https://www.pegelonline.wsv.de/gast/pegelinformationen?scrollPosition=0&gewaesser=ELBE'
+url = 'https://www.pegelonline.wsv.de/webservices/rest-api/v2/stations.json?includeTimeseries=true&includeCurrentMeasurement=true'
 
 
 # load tor control port pw
@@ -42,30 +42,27 @@ def renew_tor_connection():
         controller.signal(Signal.NEWNYM)
 
 def call_pegel():
-  # Webseite abrufen
-  response = requests.get(url, proxies=proxies)
-  
-  # Stelle sicher, dass die Anfrage erfolgreich war
-  if response.status_code == 200:
-      soup = BeautifulSoup(response.content, 'html.parser')
-      data_rows = soup.find_all("tr", {"class": ["tablerow1", "tablerow2"]})
-  
-      # Adjusting column selection to correctly extract "Wasserstand relativ zum PNP"
-      extracted_data = []
-  
-      for row in data_rows:
-          columns = row.find_all("td")
-          if columns:
-              pegelname = columns[0].get_text(strip=True)
-              km = columns[2].get_text(strip=True)
-              wasserstand_pnp = columns[-2].get_text(strip=True).split('\r')[0]
-              if pegelname != 'Pegelname':
-                  wasserstand = float(wasserstand_pnp)
+    # ausschluss von ['PRELOUC',]
+    exclude_list_for_pegel_call = [""]
+    extracted_data = []
+    pegel_response = requests.get(url, proxies=proxies)
+    r = json.loads(pegel_response.text)
+    print("")
+    for item in r:
+      if item['water']['shortname'] == 'ELBE':
+        pegelname = item['shortname']
+        km = float(item['km'])
+        if "timeseries" in item:
+            for series in item["timeseries"]:
+                if series["shortname"] == "W":
+                  wasserstand = float(series["currentMeasurement"]["value"])
+
                   extracted_data.append((pegelname, km, wasserstand))
-      # for debug
-      #for pegel, km, wasserstand in extracted_data:
-      #    print(f"{pegel}({km}km): {wasserstand}")
-      return extracted_data
+    # debug
+    #for pegel, km, wasserstand in extracted_data:
+    #    print(f"{pegel}({km}km): {wasserstand}")
+    #return extracted_data
+
 
 def push_to_influxdb(data):
     client = influxdb_client.InfluxDBClient(
