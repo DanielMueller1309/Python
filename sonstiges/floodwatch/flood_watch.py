@@ -42,8 +42,6 @@ def renew_tor_connection():
         controller.signal(Signal.NEWNYM)
 
 def call_pegel():
-    # ausschluss von ['PRELOUC',]
-    exclude_list_for_pegel_call = [""]
     extracted_data = []
     pegel_response = requests.get(url, proxies=proxies)
     r = json.loads(pegel_response.text)
@@ -61,7 +59,7 @@ def call_pegel():
     # debug
     #for pegel, km, wasserstand in extracted_data:
     #    print(f"{pegel}({km}km): {wasserstand}")
-    #return extracted_data
+    return extracted_data
 
 
 def push_to_influxdb(data):
