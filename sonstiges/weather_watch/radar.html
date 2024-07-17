@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regenradar</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            text-align: center;
+            width: 80%;
+        }
+        .slider {
+            width: 100%;
+            position: relative;
+        }
+        .slider img {
+            display: none;
+            width: 100%;
+            height: auto;
+        }
+        .slider img.active {
+            display: block;
+        }
+        #slider {
+            width: 100%;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Aktuelles Regenradar</h1>
+    <div class="slider" id="image-container"></div>
+    <input type="range" id="slider" min="0" max="0" step="1" value="0">
+</div>
+<script>
+        function loadImages() {
+            fetch('get_images.php')
+            .then(response => response.json())
+            .then(data => {
+                if (data.status !== 'success') {
+                    console.error('Fehler beim Laden der Bilder:', data);
+                    const container = document.getElementById('image-container');
+                    container.innerHTML = '<p>Fehler beim Laden der Bilder</p>';
+                    return;
+                }
+
+                const images = data.images;
+                const container = document.getElementById('image-container');
+                container.innerHTML = ''; // Container leeren
+
+                if (images.length === 0) {
+                    container.innerHTML = '<p>Keine Bilder gefunden</p>';
+                    return;
+                }
+
+                images.forEach((image, index) => {
+                    const img = document.createElement('img');
+                    img.src = image;
+                    if (index === images.length - 1) img.classList.add('active'); // Das aktuellste Bild anzeigen
+                    container.appendChild(img);
+                });
+
+                const slider = document.getElementById('slider');
+                slider.max = images.length - 1;
+                slider.value = images.length - 1; // Setze den Slider auf das aktuellste Bild
+
+                slider.addEventListener('input', (event) => {
+                    const index = event.target.value;
+                    const imgs = container.querySelectorAll('img');
+                    imgs.forEach((img, i) => {
+                        img.classList.toggle('active', i == index);
+                    });
+                });
+            })
+            .catch(error => {
+                console.error('Fehler beim Laden der Bilder:', error);
+                const container = document.getElementById('image-container');
+                container.innerHTML = '<p>Fehler beim Laden der Bilder</p>';
+            });
+        }
+
+        // Bilder beim Laden der Seite laden
+        loadImages();
+
+        // Seite alle 5 Minuten aktualisieren
+        setInterval(() => {
+            location.reload();
+        }, 300000); // 300000 ms = 5 Minuten
+    </script>
+</body>
+</html>
