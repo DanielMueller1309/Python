@@ -51,8 +51,16 @@
         <option value="24h">Letzte 24 Stunden</option>
         <option value="2d">Letzte 2 Tage</option>
         <option value="7d">Letzte 7 Tage</option>
+        <option value="custom">Benutzerdefinierter Zeitraum</option>
         <option value="all">Alle</option>
     </select>
+    <div id="customTimeRange" style="display:none;">
+        <label for="startTime">Startzeit:</label>
+        <input type="datetime-local" id="startTime">
+        <label for="endTime">Endzeit:</label>
+        <input type="datetime-local" id="endTime">
+        <button onclick="loadImages()">Zeitraum anwenden</button>
+    </div>
     <div class="slider" id="image-container"></div>
     <input type="range" id="slider" min="0" max="0" step="1" value="0">
     <div id="filename"></div>
@@ -71,6 +79,40 @@
 
         function loadImages() {
             const timeRange = document.getElementById('timeRange').value;
+            let startTime, endTime;
+
+            if (timeRange === 'custom') {
+                startTime = new Date(document.getElementById('startTime').value).getTime();
+                endTime = new Date(document.getElementById('endTime').value).getTime();
+            } else {
+                const now = new Date().getTime();
+                switch (timeRange) {
+                    case '1h':
+                        startTime = now - (1 * 60 * 60 * 1000);
+                        break;
+                    case '2h':
+                        startTime = now - (2 * 60 * 60 * 1000);
+                        break;
+                    case '12h':
+                        startTime = now - (12 * 60 * 60 * 1000);
+                        break;
+                    case '24h':
+                        startTime = now - (24 * 60 * 60 * 1000);
+                        break;
+                    case '2d':
+                        startTime = now - (2 * 24 * 60 * 60 * 1000);
+                        break;
+                    case '7d':
+                        startTime = now - (7 * 24 * 60 * 60 * 1000);
+                        break;
+                    case 'all':
+                    default:
+                        startTime = 0;
+                        break;
+                }
+                endTime = now;
+            }
+
             fetch(`get_images.php`)
             .then(response => response.json())
             .then(data => {
@@ -81,36 +123,9 @@
                     return;
                 }
 
-                const now = new Date().getTime();
-                let timeLimit;
-                switch (timeRange) {
-                    case '1h':
-                        timeLimit = now - (1 * 60 * 60 * 1000);
-                        break;
-                    case '2h':
-                        timeLimit = now - (2 * 60 * 60 * 1000);
-                        break;
-                    case '12h':
-                        timeLimit = now - (12 * 60 * 60 * 1000);
-                        break;
-                    case '24h':
-                        timeLimit = now - (24 * 60 * 60 * 1000);
-                        break;
-                    case '2d':
-                        timeLimit = now - (2 * 24 * 60 * 60 * 1000);
-                        break;
-                    case '7d':
-                        timeLimit = now - (7 * 24 * 60 * 60 * 1000);
-                        break;
-                    case 'all':
-                    default:
-                        timeLimit = 0;
-                        break;
-                }
-
                 const images = data.images.filter(image => {
                     const timestamp = parseTimestampFromFilename(image);
-                    return timestamp >= timeLimit;
+                    return timestamp >= startTime && timestamp <= endTime;
                 });
 
                 const container = document.getElementById('image-container');
@@ -151,6 +166,16 @@
                 container.innerHTML = '<p>Fehler beim Laden der Bilder</p>';
             });
         }
+
+        document.getElementById('timeRange').addEventListener('change', (event) => {
+            const customTimeRange = document.getElementById('customTimeRange');
+            if (event.target.value === 'custom') {
+                customTimeRange.style.display = 'block';
+            } else {
+                customTimeRange.style.display = 'none';
+                loadImages();
+            }
+        });
 
         // Bilder beim Laden der Seite laden
         loadImages();
