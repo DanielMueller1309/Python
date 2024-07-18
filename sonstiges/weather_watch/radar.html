@@ -34,17 +34,44 @@
             width: 100%;
             margin-top: 10px;
         }
+        #filename {
+            margin-top: 10px;
+            font-size: 16px;
+            color: #333;
+        }
     </style>
 </head>
 <body>
 <div class="container">
     <h1>Aktuelles Regenradar</h1>
+    <select id="timeRange" onchange="loadImages()">
+        <option value="1h">Letzte 1 Stunde</option>
+        <option value="2h">Letzte 2 Stunden</option>
+        <option value="12h">Letzte 12 Stunden</option>
+        <option value="24h">Letzte 24 Stunden</option>
+        <option value="2d">Letzte 2 Tage</option>
+        <option value="7d">Letzte 7 Tage</option>
+        <option value="all">Alle</option>
+    </select>
     <div class="slider" id="image-container"></div>
     <input type="range" id="slider" min="0" max="0" step="1" value="0">
+    <div id="filename"></div>
 </div>
 <script>
+        function parseTimestampFromFilename(filename) {
+            const dateTimeString = filename.match(/\d{8}_\d{6}/)[0];
+            const year = parseInt(dateTimeString.slice(0, 4));
+            const month = parseInt(dateTimeString.slice(4, 6)) - 1; // Monate sind 0-basiert
+            const day = parseInt(dateTimeString.slice(6, 8));
+            const hours = parseInt(dateTimeString.slice(9, 11));
+            const minutes = parseInt(dateTimeString.slice(11, 13));
+            const seconds = parseInt(dateTimeString.slice(13, 15));
+            return new Date(year, month, day, hours, minutes, seconds).getTime();
+        }
+
         function loadImages() {
-            fetch('get_images.php')
+            const timeRange = document.getElementById('timeRange').value;
+            fetch(`get_images.php`)
             .then(response => response.json())
             .then(data => {
                 if (data.status !== 'success') {
@@ -54,7 +81,38 @@
                     return;
                 }
 
-                const images = data.images;
+                const now = new Date().getTime();
+                let timeLimit;
+                switch (timeRange) {
+                    case '1h':
+                        timeLimit = now - (1 * 60 * 60 * 1000);
+                        break;
+                    case '2h':
+                        timeLimit = now - (2 * 60 * 60 * 1000);
+                        break;
+                    case '12h':
+                        timeLimit = now - (12 * 60 * 60 * 1000);
+                        break;
+                    case '24h':
+                        timeLimit = now - (24 * 60 * 60 * 1000);
+                        break;
+                    case '2d':
+                        timeLimit = now - (2 * 24 * 60 * 60 * 1000);
+                        break;
+                    case '7d':
+                        timeLimit = now - (7 * 24 * 60 * 60 * 1000);
+                        break;
+                    case 'all':
+                    default:
+                        timeLimit = 0;
+                        break;
+                }
+
+                const images = data.images.filter(image => {
+                    const timestamp = parseTimestampFromFilename(image);
+                    return timestamp >= timeLimit;
+                });
+
                 const container = document.getElementById('image-container');
                 container.innerHTML = ''; // Container leeren
 
@@ -66,6 +124,7 @@
                 images.forEach((image, index) => {
                     const img = document.createElement('img');
                     img.src = image;
+                    img.setAttribute('data-filename', image.split('/').pop());
                     if (index === images.length - 1) img.classList.add('active'); // Das aktuellste Bild anzeigen
                     container.appendChild(img);
                 });
@@ -74,12 +133,16 @@
                 slider.max = images.length - 1;
                 slider.value = images.length - 1; // Setze den Slider auf das aktuellste Bild
 
+                const filenameDisplay = document.getElementById('filename');
+                filenameDisplay.textContent = images[images.length - 1].split('/').pop(); // Zeige den Dateinamen des aktuellsten Bildes an
+
                 slider.addEventListener('input', (event) => {
                     const index = event.target.value;
                     const imgs = container.querySelectorAll('img');
                     imgs.forEach((img, i) => {
                         img.classList.toggle('active', i == index);
                     });
+                    filenameDisplay.textContent = imgs[index].getAttribute('data-filename'); // Aktualisiere den Dateinamen
                 });
             })
             .catch(error => {
