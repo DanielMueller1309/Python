@@ -13,37 +13,68 @@
             height: 100vh;
             margin: 0;
             background-color: #f0f0f0;
+            overflow: hidden;
         }
         .container {
             text-align: center;
-            width: 80%;
-        }
-        .slider {
             width: 100%;
-            position: relative;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            box-sizing: border-box;
         }
-        .slider img {
+        .slider-container {
+            width: 100%;
+            margin-bottom: 5px;
+        }
+        .image-container {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: calc(100% - 70px); /* Adjust height for other elements */
+        }
+        .image-container img {
             display: none;
-            width: 100%;
-            height: auto;
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
         }
-        .slider img.active {
+        .image-container img.active {
             display: block;
         }
         #slider {
             width: 100%;
-            margin-top: 10px;
         }
         #filename {
-            margin-top: 10px;
-            font-size: 16px;
+            font-size: 12px;
             color: #333;
+            word-wrap: break-word;
+        }
+        #customTimeRange {
+            display: flex;
+            flex-direction: column;
+            margin: 10px 0;
+        }
+        #customTimeRange label, #customTimeRange input, #customTimeRange button {
+            margin-bottom: 5px;
+        }
+        @media (min-width: 600px) {
+            #customTimeRange {
+                flex-direction: row;
+                align-items: center;
+            }
+            #customTimeRange label, #customTimeRange input, #customTimeRange button {
+                margin-bottom: 0;
+                margin-right: 10px;
+            }
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>Aktuelles Regenradar</h1>
     <select id="timeRange" onchange="loadImages()">
         <option value="1h">Letzte 1 Stunde</option>
         <option value="2h">Letzte 2 Stunden</option>
@@ -61,129 +92,131 @@
         <input type="datetime-local" id="endTime">
         <button onclick="loadImages()">Zeitraum anwenden</button>
     </div>
-    <div class="slider" id="image-container"></div>
-    <input type="range" id="slider" min="0" max="0" step="1" value="0">
-    <div id="filename"></div>
+    <div class="slider-container">
+        <input type="range" id="slider" min="0" max="0" step="1" value="0">
+        <div id="filename"></div>
+    </div>
+    <div class="image-container" id="image-container"></div>
 </div>
 <script>
-        function parseTimestampFromFilename(filename) {
-            const dateTimeString = filename.match(/\d{8}_\d{6}/)[0];
-            const year = parseInt(dateTimeString.slice(0, 4));
-            const month = parseInt(dateTimeString.slice(4, 6)) - 1; // Monate sind 0-basiert
-            const day = parseInt(dateTimeString.slice(6, 8));
-            const hours = parseInt(dateTimeString.slice(9, 11));
-            const minutes = parseInt(dateTimeString.slice(11, 13));
-            const seconds = parseInt(dateTimeString.slice(13, 15));
-            return new Date(year, month, day, hours, minutes, seconds).getTime();
+    function parseTimestampFromFilename(filename) {
+        const dateTimeString = filename.match(/\d{8}_\d{6}/)[0];
+        const year = parseInt(dateTimeString.slice(0, 4));
+        const month = parseInt(dateTimeString.slice(4, 6)) - 1; // Monate sind 0-basiert
+        const day = parseInt(dateTimeString.slice(6, 8));
+        const hours = parseInt(dateTimeString.slice(9, 11));
+        const minutes = parseInt(dateTimeString.slice(11, 13));
+        const seconds = parseInt(dateTimeString.slice(13, 15));
+        return new Date(year, month, day, hours, minutes, seconds).getTime();
+    }
+
+    function loadImages() {
+        const timeRange = document.getElementById('timeRange').value;
+        let startTime, endTime;
+
+        if (timeRange === 'custom') {
+            startTime = new Date(document.getElementById('startTime').value).getTime();
+            endTime = new Date(document.getElementById('endTime').value).getTime();
+        } else {
+            const now = new Date().getTime();
+            switch (timeRange) {
+                case '1h':
+                    startTime = now - (1 * 60 * 60 * 1000);
+                    break;
+                case '2h':
+                    startTime = now - (2 * 60 * 60 * 1000);
+                    break;
+                case '12h':
+                    startTime = now - (12 * 60 * 60 * 1000);
+                    break;
+                case '24h':
+                    startTime = now - (24 * 60 * 60 * 1000);
+                    break;
+                case '2d':
+                    startTime = now - (2 * 24 * 60 * 60 * 1000);
+                    break;
+                case '7d':
+                    startTime = now - (7 * 24 * 60 * 60 * 1000);
+                    break;
+                case 'all':
+                default:
+                    startTime = 0;
+                    break;
+            }
+            endTime = now;
         }
 
-        function loadImages() {
-            const timeRange = document.getElementById('timeRange').value;
-            let startTime, endTime;
-
-            if (timeRange === 'custom') {
-                startTime = new Date(document.getElementById('startTime').value).getTime();
-                endTime = new Date(document.getElementById('endTime').value).getTime();
-            } else {
-                const now = new Date().getTime();
-                switch (timeRange) {
-                    case '1h':
-                        startTime = now - (1 * 60 * 60 * 1000);
-                        break;
-                    case '2h':
-                        startTime = now - (2 * 60 * 60 * 1000);
-                        break;
-                    case '12h':
-                        startTime = now - (12 * 60 * 60 * 1000);
-                        break;
-                    case '24h':
-                        startTime = now - (24 * 60 * 60 * 1000);
-                        break;
-                    case '2d':
-                        startTime = now - (2 * 24 * 60 * 60 * 1000);
-                        break;
-                    case '7d':
-                        startTime = now - (7 * 24 * 60 * 60 * 1000);
-                        break;
-                    case 'all':
-                    default:
-                        startTime = 0;
-                        break;
-                }
-                endTime = now;
-            }
-
-            fetch(`get_images.php`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.status !== 'success') {
-                    console.error('Fehler beim Laden der Bilder:', data);
-                    const container = document.getElementById('image-container');
-                    container.innerHTML = '<p>Fehler beim Laden der Bilder</p>';
-                    return;
-                }
-
-                const images = data.images.filter(image => {
-                    const timestamp = parseTimestampFromFilename(image);
-                    return timestamp >= startTime && timestamp <= endTime;
-                });
-
-                const container = document.getElementById('image-container');
-                container.innerHTML = ''; // Container leeren
-
-                if (images.length === 0) {
-                    container.innerHTML = '<p>Keine Bilder gefunden</p>';
-                    return;
-                }
-
-                images.forEach((image, index) => {
-                    const img = document.createElement('img');
-                    img.src = image;
-                    img.setAttribute('data-filename', image.split('/').pop());
-                    if (index === images.length - 1) img.classList.add('active'); // Das aktuellste Bild anzeigen
-                    container.appendChild(img);
-                });
-
-                const slider = document.getElementById('slider');
-                slider.max = images.length - 1;
-                slider.value = images.length - 1; // Setze den Slider auf das aktuellste Bild
-
-                const filenameDisplay = document.getElementById('filename');
-                filenameDisplay.textContent = images[images.length - 1].split('/').pop(); // Zeige den Dateinamen des aktuellsten Bildes an
-
-                slider.addEventListener('input', (event) => {
-                    const index = event.target.value;
-                    const imgs = container.querySelectorAll('img');
-                    imgs.forEach((img, i) => {
-                        img.classList.toggle('active', i == index);
-                    });
-                    filenameDisplay.textContent = imgs[index].getAttribute('data-filename'); // Aktualisiere den Dateinamen
-                });
-            })
-            .catch(error => {
-                console.error('Fehler beim Laden der Bilder:', error);
+        fetch(`get_images.php`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.status !== 'success') {
+                console.error('Fehler beim Laden der Bilder:', data);
                 const container = document.getElementById('image-container');
                 container.innerHTML = '<p>Fehler beim Laden der Bilder</p>';
-            });
-        }
-
-        document.getElementById('timeRange').addEventListener('change', (event) => {
-            const customTimeRange = document.getElementById('customTimeRange');
-            if (event.target.value === 'custom') {
-                customTimeRange.style.display = 'block';
-            } else {
-                customTimeRange.style.display = 'none';
-                loadImages();
+                return;
             }
+
+            const images = data.images.filter(image => {
+                const timestamp = parseTimestampFromFilename(image);
+                return timestamp >= startTime && timestamp <= endTime;
+            });
+
+            const container = document.getElementById('image-container');
+            container.innerHTML = ''; // Container leeren
+
+            if (images.length === 0) {
+                container.innerHTML = '<p>Keine Bilder gefunden</p>';
+                return;
+            }
+
+            images.forEach((image, index) => {
+                const img = document.createElement('img');
+                img.src = image;
+                img.setAttribute('data-filename', image.split('/').pop());
+                if (index === images.length - 1) img.classList.add('active'); // Das aktuellste Bild anzeigen
+                container.appendChild(img);
+            });
+
+            const slider = document.getElementById('slider');
+            slider.max = images.length - 1;
+            slider.value = images.length - 1; // Setze den Slider auf das aktuellste Bild
+
+            const filenameDisplay = document.getElementById('filename');
+            filenameDisplay.textContent = images[images.length - 1].split('/').pop(); // Zeige den Dateinamen des aktuellsten Bildes an
+
+            slider.addEventListener('input', (event) => {
+                const index = event.target.value;
+                const imgs = container.querySelectorAll('img');
+                imgs.forEach((img, i) => {
+                    img.classList.toggle('active', i == index);
+                });
+                filenameDisplay.textContent = imgs[index].getAttribute('data-filename'); // Aktualisiere den Dateinamen
+            });
+        })
+        .catch(error => {
+            console.error('Fehler beim Laden der Bilder:', error);
+            const container = document.getElementById('image-container');
+            container.innerHTML = '<p>Fehler beim Laden der Bilder</p>';
         });
+    }
 
-        // Bilder beim Laden der Seite laden
-        loadImages();
+    document.getElementById('timeRange').addEventListener('change', (event) => {
+        const customTimeRange = document.getElementById('customTimeRange');
+        if (event.target.value === 'custom') {
+            customTimeRange.style.display = 'block';
+        } else {
+            customTimeRange.style.display = 'none';
+            loadImages();
+        }
+    });
 
-        // Seite alle 5 Minuten aktualisieren
-        setInterval(() => {
-            location.reload();
-        }, 300000); // 300000 ms = 5 Minuten
-    </script>
+    // Bilder beim Laden der Seite laden
+    loadImages();
+
+    // Seite alle 5 Minuten aktualisieren
+    setInterval(() => {
+        location.reload();
+    }, 300000); // 300000 ms = 5 Minuten
+</script>
 </body>
 </html>
