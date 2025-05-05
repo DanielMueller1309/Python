@@ -20,7 +20,7 @@ args = parser.parse_args()
 
 # URL der Seite, von der wir Daten extrahieren möchten
 url = 'https://www.pegelonline.wsv.de/webservices/rest-api/v2/stations.json?includeTimeseries=true&includeCurrentMeasurement=true'
-
+forecast_station_url = 'https://www.pegelonline.wsv.de/webservices/rest-api/v2/stations.json?includeForecastTimeseries=true&hasTimeseries=WV'
 
 # load tor control port pw
 with open(f'{args.tor_password_file}', 'r') as file:
@@ -45,21 +45,41 @@ def call_pegel():
     extracted_data = []
     pegel_response = requests.get(url, proxies=proxies)
     r = json.loads(pegel_response.text)
-    print("")
     for item in r:
-      if item['water']['shortname'] == 'ELBE':
-        pegelname = item['shortname']
-        km = float(item['km'])
-        if "timeseries" in item:
-            for series in item["timeseries"]:
-                if series["shortname"] == "W":
-                  wasserstand = float(series["currentMeasurement"]["value"])
-
-                  extracted_data.append((pegelname, km, wasserstand))
-    # debug
-    #for pegel, km, wasserstand in extracted_data:
-    #    print(f"{pegel}({km}km): {wasserstand}")
+        if item['water']['shortname'] == 'ELBE':
+            pegelname = item['shortname']
+            km = float(item['km'])
+            if "timeseries" in item:
+                for series in item["timeseries"]:
+                    if series["shortname"] == "W":
+                        wasserstand = float(series["currentMeasurement"]["value"])
+                        extracted_data.append((pegelname, km, wasserstand))
     return extracted_data
+
+def call_forecast_pegel():
+    forecast_response = requests.get(forecast_station_url, proxies=proxies)
+    stations = json.loads(forecast_response.text)
+    forecast_data = []
+
+    for station in stations:
+        if station['water']['shortname'] == 'ELBE':
+            pegelname = station['shortname']
+            km = float(station['km'])
+            uuid = station['uuid']
+
+            # Hole die Forecast-Messwerte
+            forecast_url = f"https://www.pegelonline.wsv.de/webservices/rest-api/v2/stations/{uuid}/WV/measurements.json"
+            try:
+                r = requests.get(forecast_url, proxies=proxies)
+                if r.status_code == 200:
+                    measurements = json.loads(r.text)
+                    for m in measurements:
+                        timestamp = m["timestamp"]
+                        value = float(m["value"])
+                        forecast_data.append((pegelname, km, value, timestamp))
+            except Exception as e:
+                print(f"Fehler beim Abrufen der Forecast-Daten für {pegelname}: {e}")
+    return forecast_data
 
 
 def push_to_influxdb(data):
@@ -68,28 +88,39 @@ def push_to_influxdb(data):
         token=influxdb_config['token'],
         org=influxdb_config['org']
     )
-
-    # Schreib-API
     write_api = client.write_api(write_options=SYNCHRONOUS)
 
-    # Datenpunkte erstellenx
     for location, km, wasserstand in data:
-      p = influxdb_client.Point("pegelstand") \
-          .tag("location", f"{location}") \
-          .tag("km", f"{km}") \
-          .field("wasserstand", wasserstand)
+        p = influxdb_client.Point("pegelstand") \
+            .tag("location", f"{location}") \
+            .tag("km", f"{km}") \
+            .field("wasserstand", wasserstand)
+        write_api.write(bucket=influxdb_config['bucket'], org=influxdb_config['org'], record=p)
 
-      # Datenpunkt schreiben
-      write_api.write(bucket=influxdb_config['bucket'], org=influxdb_config['org'], record=p)
-      # for debug
-      #print(f"Written data: Location={location}({km}km), Wasserstand={wasserstand}cm")
+def push_forecast_to_influxdb(forecast_data):
+    client = influxdb_client.InfluxDBClient(
+        url=influxdb_config['url'],
+        token=influxdb_config['token'],
+        org=influxdb_config['org']
+    )
+    write_api = client.write_api(write_options=SYNCHRONOUS)
 
+    for location, km, wasserstand, timestamp in forecast_data:
+        p = influxdb_client.Point("pegelstand") \
+            .tag("location", f"{location}") \
+            .tag("km", f"{km}") \
+            .field("wasserstand", wasserstand) \
+            .time(timestamp)
+        write_api.write(bucket="flood_watch_forcast", org=influxdb_config['org'], record=p)
 
 def main():
-  data = call_pegel()
-  push_to_influxdb(data)
-  renew_tor_connection()
+    data = call_pegel()
+    push_to_influxdb(data)
 
+    forecast_data = call_forecast_pegel()
+    push_forecast_to_influxdb(forecast_data)
+
+    renew_tor_connection()
 
 if __name__ == "__main__":
-      main()
+    main()
