@@ -104,14 +104,37 @@ def push_forecast_to_influxdb(forecast_data):
         org=influxdb_config['org']
     )
     write_api = client.write_api(write_options=SYNCHRONOUS)
+    delete_api = client.delete_api()
 
+    # Gruppiere Forecast-Daten nach location (Pegel)
+    from collections import defaultdict
+    grouped = defaultdict(list)
     for location, km, wasserstand, timestamp in forecast_data:
-        p = influxdb_client.Point("pegelstand") \
-            .tag("location", f"{location}") \
-            .tag("km", f"{km}") \
-            .field("wasserstand", wasserstand) \
-            .time(timestamp)
-        write_api.write(bucket="flood_watch_forcast", org=influxdb_config['org'], record=p)
+        grouped[location].append((km, wasserstand, timestamp))
+
+    # Für jede Station: alte Vorhersagen für die nächsten 7 Tage löschen, dann neue schreiben
+    for location, einträge in grouped.items():
+        now = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+        stop = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(time.time() + 7 * 86400))  # +7 Tage
+
+        # Vorherige Daten löschen
+        delete_api.delete(
+            start=now,
+            stop=stop,
+            predicate=f'_measurement="pegelstand" AND location="{location}"',
+            bucket="flood_watch_forcast",
+            org=influxdb_config['org']
+        )
+
+        # Neue schreiben
+        for km, wasserstand, timestamp in einträge:
+            p = influxdb_client.Point("pegelstand") \
+                .tag("location", f"{location}") \
+                .tag("km", f"{km}") \
+                .field("wasserstand", wasserstand) \
+                .time(timestamp)
+            write_api.write(bucket="flood_watch_forcast", org=influxdb_config['org'], record=p)
+
 
 def main():
     data = call_pegel()
